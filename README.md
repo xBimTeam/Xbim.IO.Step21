@@ -17,7 +17,8 @@ maintainable than the old version.
 
 ## Todo
 
-- [ ] Determine minumum public API profile
+- [ ] Reduce public API profile.
+- [ ] Provide generic access to parsing to ISouceText implementers.
 - [ ] Add XML documentation comments to all public members.
 - [ ] Should we use events for the instantiation of classes in from a consuming assembly?
 - [ ] Should we retain SyntaxTrivia (e.g. spaces and comments)? They are currently dropped when parsing.
@@ -29,7 +30,7 @@ The code is published under the CDDL-1.0 license. Additional licensing options a
 
 ## Acknowledgements
 
-The author is greatful to for exceptional resources provided by Immo Landwerth (@terrajobst) in the 
+The author is grateful to for the exceptional resources provided by Immo Landwerth (@terrajobst) in the 
 [Minsk project](https://github.com/terrajobst/minsk), that largely informed the parser's structure.
 
 ## Contact

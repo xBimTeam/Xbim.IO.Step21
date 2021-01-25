@@ -42,11 +42,10 @@ namespace NeXtract
                         var perc = startPos / totL;
                         progress.Report(perc);
                     }
-
                 }
-                Stopwatch s = new Stopwatch();
+                var s = new Stopwatch();
                 s.Start();
-                using (BufferedUri st = new BufferedUri(f))
+                using (var st = new BufferedUri(f))
                 { 
                     res = StepParsing.ParseWithEvents(st, NewHeaderEntity, NewEntityAssignment);
                     s.Stop();

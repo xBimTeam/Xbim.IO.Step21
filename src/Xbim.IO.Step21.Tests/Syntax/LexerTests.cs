@@ -14,7 +14,7 @@ namespace Xbim.IO.Step21.Tests.Syntax
             var tokens = StepParsing.ParseTokens(text, out var diagnostics);
 
             var token = Assert.Single(tokens);
-            Assert.Equal(SyntaxKind.StringToken, token.Kind);
+            Assert.Equal(SyntaxKind.StepString, token.Kind);
             Assert.Equal(text, token.Text);
 
             var diagnostic = Assert.Single(diagnostics);
@@ -34,7 +34,7 @@ namespace Xbim.IO.Step21.Tests.Syntax
             Assert.Single(tokens);
 
             var token = tokens[0];
-            Assert.Equal(SyntaxKind.IdentifierToken, token.Kind);
+            Assert.Equal(SyntaxKind.StepIdentifierToken, token.Kind);
             Assert.Equal(name, token.Text);
         }
 
@@ -62,9 +62,9 @@ namespace Xbim.IO.Step21.Tests.Syntax
             Assert.Equal(lastInt, toCheck.Value);
 
             // strings
-            toCheck = tokens.FirstOrDefault(x => x.Kind == SyntaxKind.StringToken);
+            toCheck = tokens.FirstOrDefault(x => x.Kind == SyntaxKind.StepString);
             Assert.Equal(firstString, toCheck.Value);
-            toCheck = tokens.LastOrDefault(x => x.Kind == SyntaxKind.StringToken);
+            toCheck = tokens.LastOrDefault(x => x.Kind == SyntaxKind.StepString);
             Assert.Equal(lastString, toCheck.Value);
         }
     }

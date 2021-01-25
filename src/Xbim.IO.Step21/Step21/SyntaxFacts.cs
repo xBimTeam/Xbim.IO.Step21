@@ -1,8 +1,10 @@
 namespace Xbim.IO.Step21
 {
+    /// <summary>
+    /// Convenience class defining STEP syntax information.
+    /// </summary>
     public static class SyntaxFacts
     {
-     
 
         public static bool IsComment(this SyntaxKind kind)
         {
@@ -28,7 +30,7 @@ namespace Xbim.IO.Step21
                 return SyntaxKind.StepOrIsoStartKeyword;
             if (text.StartsWith("END-ISO"))
                 return SyntaxKind.StepOrIsoEndKeyword;
-            return SyntaxKind.IdentifierToken;
+            return SyntaxKind.StepIdentifierToken;
         }
 
         // this has got to return null or lots of tests fail

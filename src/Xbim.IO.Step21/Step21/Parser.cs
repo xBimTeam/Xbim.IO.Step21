@@ -7,8 +7,22 @@ using System.Linq;
 
 namespace Xbim.IO.Step21
 {
+    /// <summary>
+    /// Triggered when encountering new header entities 
+    /// </summary>
+    /// <param name="headerEntity">data of the entity encountered</param>
     public delegate void NewHeaderEntity(StepEntitySyntax headerEntity);
-    public delegate void NewFastAssignment(StepFastEntityAssignmentSyntax fastassignment);
+
+    /// <summary>
+    /// Triggered when encountering new body entities
+    /// </summary>
+    /// <param name="fastAssignment">simplified data of the entity encountered</param>
+    public delegate void NewFastAssignment(StepFastEntityAssignmentSyntax fastAssignment);
+
+    /// <summary>
+    /// Triggered when encountering new body entities
+    /// </summary>
+    /// <param name="assignment">data of the entity encountered</param>
     public delegate void NewAssignment(StepEntityAssignmentSyntax assignment);
     
     internal sealed class Parser
@@ -55,9 +69,7 @@ namespace Xbim.IO.Step21
             return new SyntaxToken(_source, kind, Current.Position, null, null);
         }
 
-
         public bool QuickParse { get; set; } = false;
-
 
         public void ParseStepWithEvents(NewHeaderEntity? head, NewAssignment? assignment)
         {
@@ -65,7 +77,7 @@ namespace Xbim.IO.Step21
             var stepStart = MatchToken(SyntaxKind.StepOrIsoStartKeyword);
             var headerStart = MatchToken(SyntaxKind.StepStartHeaderSectionKeyword);
 
-            while (Current.Kind == SyntaxKind.IdentifierToken)
+            while (Current.Kind == SyntaxKind.StepIdentifierToken)
             {
                 var headerEntity = ParseStepEntity();
                 head?.Invoke(headerEntity);
@@ -87,7 +99,7 @@ namespace Xbim.IO.Step21
             var stepStart = MatchToken(SyntaxKind.StepOrIsoStartKeyword);
             var headerStart = MatchToken(SyntaxKind.StepStartHeaderSectionKeyword);
 
-            while (Current.Kind == SyntaxKind.IdentifierToken)
+            while (Current.Kind == SyntaxKind.StepIdentifierToken)
             {
                 var headerEntity = ParseStepEntity();
                 head?.Invoke(headerEntity);
@@ -111,7 +123,7 @@ namespace Xbim.IO.Step21
             _ = MatchToken(SyntaxKind.StepStartHeaderSectionKeyword);
 
             var headerEntities = ImmutableArray.CreateBuilder<SyntaxNode>();
-            while (Current.Kind == SyntaxKind.IdentifierToken)
+            while (Current.Kind == SyntaxKind.StepIdentifierToken)
             {
                 var headerEntity = ParseStepEntity();
                 headerEntities.Add(headerEntity);
@@ -148,11 +160,11 @@ namespace Xbim.IO.Step21
         {
             var identity = MatchToken(SyntaxKind.StepIdentityToken);
             _ = MatchToken(SyntaxKind.EqualsToken);
-            var type = MatchToken(SyntaxKind.IdentifierToken);
+            var type = MatchToken(SyntaxKind.StepIdentifierToken);
             _ = MatchToken(SyntaxKind.OpenParenthesisToken);
             SyntaxToken? firstString = null;
-            if (Current.Kind == SyntaxKind.StringToken)
-                firstString = MatchToken(SyntaxKind.StringToken);
+            if (Current.Kind == SyntaxKind.StepString)
+                firstString = MatchToken(SyntaxKind.StepString);
 
             _lexer.IgnoreValues = true;
             while (Current.Kind != SyntaxKind.SemiColonToken)
@@ -178,7 +190,7 @@ namespace Xbim.IO.Step21
         private StepEntitySyntax ParseStepEntity()
         {
             // todo: complex should start here
-            var type = MatchToken(SyntaxKind.IdentifierToken);
+            var type = MatchToken(SyntaxKind.StepIdentifierToken);
             var argumentList = ParseStepArgumentList();
             return new StepEntitySyntax(_source, type, argumentList);
         }
@@ -219,16 +231,16 @@ namespace Xbim.IO.Step21
                 case SyntaxKind.StepIdentityToken:
                 case SyntaxKind.StepInteger:
                 case SyntaxKind.StepFloat:
-                case SyntaxKind.StringToken:
+                case SyntaxKind.StepString:
                 case SyntaxKind.StepBoolean:
                 case SyntaxKind.StepEnumeration:
-                case SyntaxKind.HexToken:
+                case SyntaxKind.StepHex:
                 case SyntaxKind.StepUndefined:
                 case SyntaxKind.StepOverride:
                     return NextToken();
                 case SyntaxKind.OpenParenthesisToken:
                     return ParseStepArgumentList();
-                case SyntaxKind.IdentifierToken:
+                case SyntaxKind.StepIdentifierToken:
                     return ParseStepEntity();
             }
 

@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Xbim.IO.Step21.Step21.Text
 {
+    /// <summary>
+    /// File based buffered implementation of the <see cref="ISourceText"/> interface.
+    /// </summary>
     public class BufferedUri : ISourceText, IDisposable
     {
         [Conditional("DEBUG")]
@@ -17,15 +20,20 @@ namespace Xbim.IO.Step21.Step21.Text
             }
         }
 
-        public BufferedUri(FileInfo f, int BufferSize = 128000) // default 128K
+        /// <summary>
+        /// Standard constructor via file identification and size of buffer
+        /// </summary>
+        /// <param name="file">the source of the buffered text</param>
+        /// <param name="BufferSize">size of memory buffer</param>
+        public BufferedUri(FileInfo file, int BufferSize = 128000) // default 128K
         {
             if (BufferSize < 2)
                 throw new ArgumentOutOfRangeException(nameof(BufferSize), "Argument cannot be smaller than 2");
             Warning(BufferSize);
            
             _disposedValue = false;
-            _sourceFile = new Uri(f.FullName);
-            _streamReader = new StreamReader(f.FullName, true);
+            _sourceFile = new Uri(file.FullName);
+            _streamReader = new StreamReader(file.FullName, true);
             _buffer = new char[BufferSize];
             _bufferLen = _streamReader.ReadBlock(_buffer);
             _position = 0;
@@ -76,15 +84,18 @@ namespace Xbim.IO.Step21.Step21.Text
         /// </summary>
         private long _spanOffset;
 
-        // private bool _crossingBuffers;
 
-        // todo: rename once working
-        public string FileName => _sourceFile.ToString();
-
-        // because we can move the _currspan in the evaluation of Lookahead this could become slow...
-        // therefore we cache current char, it's also used a lot in the lexer.
+        /// <summary>
+        /// The character being parsed.
+        ///
+        /// Because we can move the current in the evaluation of Lookahead we cache current char to make access faster.
+        /// </summary>
         public char Current => _current;
 
+        /// <summary>
+        /// The value of the upcoming character in the data.
+        /// This automatically reads the next chunk of data if needed.
+        /// </summary>
         public char Lookahead
         {
             get
@@ -100,9 +111,12 @@ namespace Xbim.IO.Step21.Step21.Text
         }
 
         /// <summary>
-        /// Allocates a new string in memory, copying data from the span already loaded.
+        /// A string representation of the token from Start to Current position.
+        ///
+        /// Since we might have moved the data buffer forward during parsing
+        /// we retain a stringbuilder with any portion of previous chunks.
         /// </summary>
-        /// <returns>A string representation of the token from Start to Current position</returns>
+        /// <returns></returns>
         public string CurrentBuffer()
         {
             if (_crossingCurrentBuilder is null)
@@ -122,12 +136,14 @@ namespace Xbim.IO.Step21.Step21.Text
             return new string(_buffer, start, l);
         }
 
+        /// <summary>
+        /// Pointer to the start of the current token
+        /// </summary>
         public long GetBufferStartIndex() => _start;
 
         /// <summary>
-        /// 
+        /// Pointer to the portion of the source data that defines the current token
         /// </summary>
-        /// <returns></returns>
         public TextSpan GetTokenSpan()
         {
             var length = (int)(_position - _start);
@@ -136,6 +152,9 @@ namespace Xbim.IO.Step21.Step21.Text
 
         bool _lookAheadProg = false;
 
+        /// <summary>
+        /// Moves the cursor forward by one character
+        /// </summary>
         public void ProgressChar()
         {
             _position++;
@@ -159,8 +178,14 @@ namespace Xbim.IO.Step21.Step21.Text
         private int PositionInBuffer => (int)(_position - _spanOffset);
         private int StartInBuffer => (int)(_start - _spanOffset);
 
+        /// <summary>
+        /// Identifier of the data source
+        /// </summary>
         public Uri Source { get => _sourceFile; }
 
+        /// <summary>
+        /// Informs the source that a token start is encountered
+        /// </summary>
         public void SetTokenStart()
         {
             _start = _position;
@@ -211,6 +236,9 @@ namespace Xbim.IO.Step21.Step21.Text
         //     Dispose(disposing: false);
         // }
 
+        /// <summary>
+        /// Implementing IDispose.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

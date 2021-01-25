@@ -5,17 +5,29 @@ using System.Text;
 
 namespace Xbim.IO.Step21.Text
 {
+    /// <summary>
+    /// Simplistic implementation of the <see cref="ISourceText"/> interface.
+    /// </summary>
     public sealed class SourceText : ISourceText
     {
         private readonly string _text;
 
-        private SourceText(string text, Uri fileName)
+        /// <summary>
+        /// Construction from text when an original URI source is available
+        /// </summary>
+        /// <param name="text">The content of the data</param>
+        /// <param name="source">Identifier of the source</param>
+        private SourceText(string text, Uri source)
         {
             _text = text;
-            Source = fileName;
+            Source = source;
             Lines = ParseLines(this, text);
         }
 
+        /// <summary>
+        /// Construction from bare text builds an artificial URI for the source
+        /// </summary>
+        /// <param name="text">the data to evaluate</param>
         public static SourceText From(string text)
         {
             var dataUri = "data:," + text;
@@ -23,6 +35,10 @@ namespace Xbim.IO.Step21.Text
             return From(text, uri);
         }
 
+        /// <summary>
+        /// Helper method to direct parsing of files through memory allocation. This is not efficient for large files.
+        /// </summary>
+        /// <param name="fileInfo">File to get the data from.</param>
         public static SourceText From(FileInfo fileInfo)
         {
             var text = File.ReadAllText(fileInfo.FullName);
@@ -30,9 +46,14 @@ namespace Xbim.IO.Step21.Text
             return new SourceText(text, uri);
         }
 
-        public static SourceText From(string text, Uri fileName)
+        /// <summary>
+        /// Construction from text when an original URI source is available
+        /// </summary>
+        /// <param name="text">The content of the data</param>
+        /// <param name="source">Identifier of the source</param>
+        public static SourceText From(string text, Uri source)
         {
-            return new SourceText(text, fileName);
+            return new SourceText(text, source);
         }
 
         private static ImmutableArray<TextLine> ParseLines(SourceText sourceText, string text)
@@ -89,14 +110,21 @@ namespace Xbim.IO.Step21.Text
 
         internal ImmutableArray<TextLine> Lines { get; }
 
-        public char this[int index] => _text[index];
+        private char this[int index] => _text[index];
 
-        // public int Length => _text.Length;
-
+        /// <summary>
+        /// Identifier of the data source
+        /// </summary>
         public Uri Source { get; }
 
+        /// <summary>
+        /// The character being parsed
+        /// </summary>
         public char Current => Peek(0);
 
+        /// <summary>
+        /// The value of the upcoming character in the data
+        /// </summary>
         public char Lookahead => Peek(1);
 
 
@@ -113,7 +141,7 @@ namespace Xbim.IO.Step21.Text
             return GetChar(index);
         }
 
-        public int GetLineIndex(long position)
+        internal int GetLineIndex(long position)
         {
             var lower = 0;
             var upper = Lines.Length - 1;
@@ -139,28 +167,39 @@ namespace Xbim.IO.Step21.Text
             return lower - 1;
         }
 
+        /// <summary>
+        /// Overrides ToString() to return the entire content.
+        /// </summary>
         public override string ToString() => _text;
 
-        // used for currentbuffer
         private string ToString(long start, long length) => _text.Substring((int)start, (int)length);
 
-        public string ToString(TextSpan span) => ToString(span.Start, span.Length);
+        internal string ToString(TextSpan span) => ToString(span.Start, span.Length);
 
         private char GetChar(int index)
         {
             return this[index];
         }
 
+        /// <summary>
+        /// Informs the source that a token start is encountered
+        /// </summary>
         public void SetTokenStart()
         {
             _start = _position;
         }
 
+        /// <summary>
+        /// Moves the cursor forward by one character
+        /// </summary>
         public void ProgressChar()
         {
             _position++;
         }
 
+        /// <summary>
+        /// A string representation of the token from Start to Current position
+        /// </summary>
         public string CurrentBuffer()
         {
             var length = _position - _start;
@@ -168,12 +207,18 @@ namespace Xbim.IO.Step21.Text
             return text;
         }
 
+        /// <summary>
+        /// Pointer to the portion of the source data that defines the current token
+        /// </summary>        
         public TextSpan GetTokenSpan()
         {
             var length = _position - _start;
             return new TextSpan(_start, length);
         }
 
+        /// <summary>
+        /// Pointer to the start of the current token
+        /// </summary>
         public long GetBufferStartIndex() => _start;
         
     }

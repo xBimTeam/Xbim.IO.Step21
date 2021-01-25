@@ -213,8 +213,8 @@ namespace Xbim.IO.Step21
                 }
             }
 
-            /// we cannot ignore the content to determine the return,
-            /// even if <see cref="IgnoreValues"/> is true.
+            // we cannot ignore the content to determine the return,
+            // even if <see cref="IgnoreValues"/> is true.
             string text = CurrentBuffer();
             switch (text)
             {
@@ -415,7 +415,7 @@ namespace Xbim.IO.Step21
                         break;
                 }
             }
-            _kind = SyntaxKind.StringToken;
+            _kind = SyntaxKind.StepString;
             if (IgnoreValues)
                 return;
             var t = CurrentBuffer();
@@ -464,7 +464,7 @@ namespace Xbim.IO.Step21
                         break;
                 }
             }
-            _kind = SyntaxKind.HexToken;
+            _kind = SyntaxKind.StepHex;
             if (IgnoreValues)
                 return;          
             _value = CurrentBuffer()[1..^1];
@@ -539,7 +539,7 @@ namespace Xbim.IO.Step21
             string text = CurrentBuffer();
 
             _kind = SyntaxFacts.GetKeywordKind(text);
-            if (_kind != SyntaxKind.IdentifierToken)
+            if (_kind != SyntaxKind.StepIdentifierToken)
             {
                 // for all keyords we expect a ;
                 if (Current == ';')

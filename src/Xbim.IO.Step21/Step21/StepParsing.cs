@@ -23,6 +23,8 @@ namespace Xbim.IO.Step21
         public ImmutableArray<Diagnostic> Diagnostics { get; }
         public StepSyntax Root { get; }
 
+        // todo: 2021: use better ISource than SourceText
+
         public static StepParsing Load(string fileName)
         {
             var text = File.ReadAllText(fileName);

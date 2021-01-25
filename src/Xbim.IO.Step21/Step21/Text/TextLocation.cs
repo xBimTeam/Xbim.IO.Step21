@@ -10,6 +10,7 @@ namespace Xbim.IO.Step21.Text
             Span = span;
             Text = null;
         }
+
         public TextLocation(ISourceText text, TextSpan span)
         {
             Text = text;
@@ -27,6 +28,7 @@ namespace Xbim.IO.Step21.Text
         }
 
         public Uri FileName => Source;
+
         public int StartLine
         {
             get
