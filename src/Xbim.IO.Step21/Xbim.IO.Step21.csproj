@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <Authors>Claudio Benghi</Authors>
+    <Company />
+    <Copyright>Claudio Benghi</Copyright>
+    <PackageLicenseExpression>CDDL-1.0</PackageLicenseExpression>
+    <Description>Fast Express STEP part 21 parsing in .NET
+
+This library is designed for schema-independent STEP parsing. It provides file parsing, but does not enforce entity schema constraints.</Description>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <FileVersion>5.0.0.0</FileVersion>
+    <PackageIcon>xbim-toolkit-icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/CBenghi/Xbim.IO.Step21</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CBenghi/Xbim.IO.Step21.git</RepositoryUrl>
+    <Version>5.0</Version>
+    <DocumentationFile>bin\$(Configuration)\Xbim.IO.Step21.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\xbim-toolkit-icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

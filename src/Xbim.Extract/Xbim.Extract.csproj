@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Claudio Benghi</Authors>
+    <Copyright>Claudio Benghi</Copyright>
+    <PackageLicenseExpression>CDDL-1.0</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xbim.IO.Step21\Xbim.IO.Step21.csproj" />
+  </ItemGroup>
+
+</Project>
