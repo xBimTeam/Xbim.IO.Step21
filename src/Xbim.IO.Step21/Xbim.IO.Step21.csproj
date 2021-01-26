@@ -14,8 +14,8 @@ This library is designed for schema-independent STEP parsing. It provides file p
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
     <PackageIcon>xbim-toolkit-icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/CBenghi/Xbim.IO.Step21</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/CBenghi/Xbim.IO.Step21.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/xBimTeam/Xbim.IO.Step21</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/xBimTeam/Xbim.IO.Step21.git</RepositoryUrl>
     <Version>5.0.0-develop</Version>
     <DocumentationFile>bin\$(Configuration)\Xbim.IO.Step21.xml</DocumentationFile>
   </PropertyGroup>
