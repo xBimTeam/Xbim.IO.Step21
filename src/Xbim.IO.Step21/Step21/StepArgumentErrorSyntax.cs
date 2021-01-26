@@ -17,7 +17,9 @@ namespace Xbim.IO.Step21
             Value = value;
         }
 
-
+        /// <summary>
+        /// The classification of the node
+        /// </summary>
         public override SyntaxKind Kind => SyntaxKind.StepArgumentError;
 
         /// <summary>

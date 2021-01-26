@@ -71,7 +71,6 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Subcomponents of the node
         /// </summary>
-        /// <returns></returns>
         public abstract IEnumerable<SyntaxNode> GetChildren();
 
         /// <summary>

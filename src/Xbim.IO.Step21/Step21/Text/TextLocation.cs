@@ -2,33 +2,57 @@ using System;
 
 namespace Xbim.IO.Step21.Text
 {
+    /// <summary>
+    /// Identifies a span within a source
+    /// </summary>
     public struct TextLocation
     {
+        /// <summary>
+        /// Convenience constructor used in diagnostics
+        /// </summary>
         public TextLocation(Uri source, TextSpan span)
         {
-            Source = source;
+            SourceIdentifier = source;
             Span = span;
             Text = null;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public TextLocation(ISourceText text, TextSpan span)
         {
             Text = text;
-            Source = text.Source;
+            SourceIdentifier = text.Source;
             Span = span;
         }
 
+        /// <summary>
+        /// If available the source text goes here
+        /// </summary>
         public ISourceText? Text { get; }
-        public Uri Source{ get; }
+
+        /// <summary>
+        /// URI of the source
+        /// </summary>
+        public Uri SourceIdentifier{ get; }
+
+        /// <summary>
+        /// Relevant portion in the source data
+        /// </summary>
         public TextSpan Span { get; }
 
+        /// <summary>
+        /// Debug friendly override
+        /// </summary>
         public override string ToString()
         {
-            return $"{FileName}({StartLine + 1},{StartCharacter + 1}->{EndLine + 1},{EndCharacter + 1}): ";
+            return $"{SourceIdentifier}({StartLine + 1},{StartCharacter + 1}->{EndLine + 1},{EndCharacter + 1}): ";
         }
 
-        public Uri FileName => Source;
-
+        /// <summary>
+        /// Coordinate of the relevant text within the source
+        /// </summary>
         public int StartLine
         {
             get
@@ -39,6 +63,9 @@ namespace Xbim.IO.Step21.Text
             }
         }
 
+        /// <summary>
+        /// Coordinate of the relevant text within the source
+        /// </summary>
         public long StartCharacter
         {
             get
@@ -49,6 +76,9 @@ namespace Xbim.IO.Step21.Text
             }
         }
 
+        /// <summary>
+        /// Coordinate of the relevant text within the source
+        /// </summary>
         public int EndLine
         {
             get
@@ -59,6 +89,9 @@ namespace Xbim.IO.Step21.Text
             }
         }
 
+        /// <summary>
+        /// Coordinate of the relevant text within the source
+        /// </summary>
         public long EndCharacter
         {
             get

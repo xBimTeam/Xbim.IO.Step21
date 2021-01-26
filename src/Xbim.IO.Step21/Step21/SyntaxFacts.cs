@@ -5,12 +5,19 @@ namespace Xbim.IO.Step21
     /// </summary>
     public static class SyntaxFacts
     {
-
+        /// <summary>
+        /// Helper method to deterime if a kind is of type comment
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <returns></returns>
         public static bool IsComment(this SyntaxKind kind)
         {
             return kind == SyntaxKind.MultiLineCommentTrivia;
         }
 
+        /// <summary>
+        /// Helper method to get kind from from special string
+        /// </summary>
         public static SyntaxKind GetKeywordKind(string text)
         {
             switch (text)
@@ -33,7 +40,9 @@ namespace Xbim.IO.Step21
             return SyntaxKind.StepIdentifierToken;
         }
 
-        // this has got to return null or lots of tests fail
+        /// <summary>
+        /// Specific kinds have direct mapping to string
+        /// </summary>
         public static string? GetText(SyntaxKind kind)
         {
             return kind switch
@@ -42,11 +51,13 @@ namespace Xbim.IO.Step21
                 SyntaxKind.OpenParenthesisToken => "(",
                 SyntaxKind.CloseParenthesisToken => ")",
                 SyntaxKind.CommaToken => ",",
-                // todo: implement all missing kinds
                 _ => null,
             };
         }
 
+        /// <summary>
+        /// Helper method to deterime if a kind is of type trivia
+        /// </summary>
         public static bool IsTrivia(this SyntaxKind kind)
         {
             return kind switch
@@ -58,15 +69,12 @@ namespace Xbim.IO.Step21
             };
         }
 
+        /// <summary>
+        /// Helper method to deterime if a kind is of type keyword
+        /// </summary>
         public static bool IsKeyword(this SyntaxKind kind)
         {
             return kind.ToString().EndsWith("Keyword");
-        }
-
-        public static bool IsToken(this SyntaxKind kind)
-        {
-            return !kind.IsTrivia() &&
-                   (kind.IsKeyword() || kind.ToString().EndsWith("Token"));
         }
     }
 }
