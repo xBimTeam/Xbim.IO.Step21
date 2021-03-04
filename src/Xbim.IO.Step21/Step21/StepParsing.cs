@@ -14,7 +14,6 @@ namespace Xbim.IO.Step21
     {
         private delegate void ParseHandler(ISourceText sourceText, out StepSyntax root, out ImmutableArray<Diagnostic> diagnostics);
 
-
         private StepParsing(ISourceText text, ParseHandler stepSyntaxGenerator)
         {
             stepSyntaxGenerator(text, out var root, out var diagnostics);
@@ -33,8 +32,6 @@ namespace Xbim.IO.Step21
         /// Returns the root node of the file hierarchy.
         /// </summary>
         public StepSyntax Root { get; }
-
-        // todo: 2021: use better ISource than SourceText
 
         /// <summary>
         /// Static metod to get the parsing from a filename

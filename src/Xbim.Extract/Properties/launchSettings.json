@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Xbim.Extract": {
+      "commandName": "Project",
+      "commandLineArgs": "strip C:\\Data\\Ifc\\Basics\\d.ifc -e 7899"
+    }
+  }
+}
