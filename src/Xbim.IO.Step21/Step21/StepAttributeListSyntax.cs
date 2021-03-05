@@ -7,23 +7,23 @@ namespace Xbim.IO.Step21
     /// Argument lists of an entity
     /// E.G.: (ARG1, ARG2, ..., ARGn)
     /// </summary>
-    public class StepArgumentListSyntax : SyntaxNode
+    public class StepAttributeListSyntax : SyntaxNode
     {
         /// <summary>
         /// 
         /// </summary>
         private readonly SyntaxToken _openParenthesisToken;
-        private readonly SeparatedSyntaxList<SyntaxNode> _arguments;
+        public readonly SeparatedSyntaxList<SyntaxNode> Attributes;
         private readonly SyntaxToken _closeParenthesisToken;
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public StepArgumentListSyntax(Uri syntaxTree, SyntaxToken openParenthesisToken, SeparatedSyntaxList<SyntaxNode> arguments, SyntaxToken closeParenthesisToken)
+        public StepAttributeListSyntax(Uri syntaxTree, SyntaxToken openParenthesisToken, SeparatedSyntaxList<SyntaxNode> arguments, SyntaxToken closeParenthesisToken)
             : base (syntaxTree)
         {
             this._openParenthesisToken = openParenthesisToken;
-            this._arguments = arguments;
+            this.Attributes = arguments;
             this._closeParenthesisToken = closeParenthesisToken;
         }
 
@@ -38,7 +38,7 @@ namespace Xbim.IO.Step21
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             yield return _openParenthesisToken;
-            foreach (var argument in _arguments)
+            foreach (var argument in Attributes)
             {
                 yield return argument;
             }

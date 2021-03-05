@@ -7,16 +7,16 @@ namespace Xbim.IO.Step21
     /// Simplified Entity assignment, does not parse the attributes of the elements (except for the first one if it's a string)
     /// E.g.: #230=IFCWALL('guidvalue', ... IGNORED ... );
     /// </summary>
-    public class StepFastEntityAssignmentSyntax : SyntaxNode
+    public class StepEntityAssignmentBareSyntax : SyntaxNode
     {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public StepFastEntityAssignmentSyntax(Uri syntaxTree, SyntaxToken identity, SyntaxToken type, SyntaxToken? firstString)
+        public StepEntityAssignmentBareSyntax(Uri syntaxTree, SyntaxToken identity, SyntaxToken type, SyntaxToken? firstString)
             : base(syntaxTree)
         {
             Identity = identity;
-            Type = type;
+            ExpressType = type;
             FirstString = firstString;
         }
 
@@ -33,7 +33,7 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// The type of step class being assigned
         /// </summary>
-        public SyntaxToken Type { get; }
+        public SyntaxToken ExpressType { get; }
 
         /// <summary>
         /// If the first of the arguments is a string it gets captured here.
@@ -47,7 +47,7 @@ namespace Xbim.IO.Step21
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             yield return Identity;
-            yield return Type;
+            yield return ExpressType;
             if (FirstString != null)
                 yield return FirstString;
         }

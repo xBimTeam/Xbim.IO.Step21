@@ -99,7 +99,7 @@ namespace Xbim.Extract
             {
                 using (var progress = new ProgressBar())
                 {
-                    void FastEntityAssignment(StepFastEntityAssignmentSyntax assignment)
+                    void FastEntityAssignment(StepEntityAssignmentBareSyntax assignment)
                     {
                         entityCount++;
                         if (entityCount % 1000 == 0)

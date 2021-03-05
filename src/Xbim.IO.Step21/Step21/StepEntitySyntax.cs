@@ -8,17 +8,28 @@ namespace Xbim.IO.Step21
     /// </summary>
     public class StepEntitySyntax : SyntaxNode
     {
-        private readonly SyntaxToken _type;
-        private readonly StepArgumentListSyntax _argumentList;
+        /// <summary>
+        /// The class name of the entity in the model (i.e. express class name)
+        /// </summary>
+        public readonly SyntaxToken ExpressType;
+        
+        private readonly StepAttributeListSyntax _attributes;
+
+        /// <summary>
+        /// List of explicit attributes in the entity.
+        /// The parser does not provide access to derived and inverse attributes.
+        /// See https://en.wikipedia.org/wiki/EXPRESS_(data_modeling_language)#Entity-Attribute
+        /// </summary>
+        public IEnumerable<SyntaxNode> Attributes => _attributes.Attributes;
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public StepEntitySyntax(Uri syntaxTree, SyntaxToken type, StepArgumentListSyntax argumentList)
+        public StepEntitySyntax(Uri syntaxTree, SyntaxToken type, StepAttributeListSyntax attributeList)
             : base(syntaxTree)
         {
-            _type = type;
-            _argumentList = argumentList;
+            ExpressType = type;
+            _attributes = attributeList;
         }
 
         /// <summary>
@@ -31,8 +42,8 @@ namespace Xbim.IO.Step21
         /// </summary>
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            yield return _type;
-            yield return _argumentList;
+            yield return ExpressType;
+            yield return _attributes;
         }
     }
 }

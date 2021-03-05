@@ -116,7 +116,7 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Static helper for full token parsing
         /// </summary>
-        public static IEnumerable<Diagnostic> ParseWithEvents(BufferedUri st, NewHeaderEntity newHeader, NewAssignment newAssignment)
+        public static IEnumerable<Diagnostic> ParseWithEvents(ISourceText st, NewHeaderEntity newHeader, NewAssignment newAssignment)
         {
             Parser p = new Parser(st);
             p.ParseStepWithEvents(newHeader, newAssignment);
@@ -126,10 +126,10 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Static helper for fast but simplified token parsing
         /// </summary>
-        public static IEnumerable<Diagnostic> ParseWithEvents(BufferedUri st, NewHeaderEntity newHeader, NewFastAssignment newAssignment)
+        public static IEnumerable<Diagnostic> ParseWithEvents(ISourceText st, NewHeaderEntity newHeader, NewAssignmentIgnoreAttributes newFastAssignment)
         {
             Parser p = new Parser(st);
-            p.ParseStepWithEvents(newHeader, newAssignment);
+            p.ParseStepWithEvents(newHeader, newFastAssignment);
             return p.Diagnostics;
         }
     }

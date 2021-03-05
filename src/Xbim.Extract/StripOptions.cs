@@ -55,14 +55,14 @@ namespace Xbim.Extract
             int entityCount = 0;
             int headerCount = 0;
             IEnumerable<Diagnostic> res;
-            void NewHeaderEntity(StepEntitySyntax headerEntity)
+            void OnHeaderFound(StepEntitySyntax headerEntity)
             {
                 Console.WriteLine(headerEntity);
                 headerCount++;
             }
             using (var progress = new ProgressBar())
             {
-                void FastEntityAssignment(StepFastEntityAssignmentSyntax assignment)
+                void OnEntityFound(StepEntityAssignmentBareSyntax assignment)
                 {
                     var t = int.Parse(assignment.Identity.Text.Substring(1));
                     if (required.Contains(t))
@@ -83,7 +83,7 @@ namespace Xbim.Extract
                 s.Start();
                 using (BufferedUri st = new BufferedUri(f))
                 {
-                    res = StepParsing.ParseWithEvents(st, NewHeaderEntity, FastEntityAssignment);
+                    res = StepParsing.ParseWithEvents(st, OnHeaderFound, OnEntityFound);
                     s.Stop();
                     Thread.Sleep(200);
                     progress.Report(1);

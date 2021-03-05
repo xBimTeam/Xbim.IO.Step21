@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Xbim.IO.Step21.Tests")]
@@ -10,20 +11,20 @@ namespace Xbim.IO.Step21
     /// <summary>
     /// Triggered when encountering new header entities 
     /// </summary>
-    /// <param name="headerEntity">data of the entity encountered</param>
-    public delegate void NewHeaderEntity(StepEntitySyntax headerEntity);
+    /// <param name="headerEntityFound">data of the entity encountered</param>
+    public delegate void NewHeaderEntity(StepEntitySyntax headerEntityFound);
 
     /// <summary>
     /// Triggered when encountering new body entities
     /// </summary>
-    /// <param name="fastAssignment">simplified data of the entity encountered</param>
-    public delegate void NewFastAssignment(StepFastEntityAssignmentSyntax fastAssignment);
+    /// <param name="AssignmentFound">simplified data of the entity encountered</param>
+    public delegate void NewAssignmentIgnoreAttributes(StepEntityAssignmentBareSyntax AssignmentFound);
 
     /// <summary>
     /// Triggered when encountering new body entities
     /// </summary>
-    /// <param name="assignment">data of the entity encountered</param>
-    public delegate void NewAssignment(StepEntityAssignmentSyntax assignment);
+    /// <param name="assignmentFound">data of the entity encountered</param>
+    public delegate void NewAssignment(StepEntityAssignmentSyntax assignmentFound);
     
     internal sealed class Parser
     {
@@ -93,7 +94,7 @@ namespace Xbim.IO.Step21
             _ = MatchToken(SyntaxKind.StepOrIsoEndKeyword);
         }
 
-        public void ParseStepWithEvents(NewHeaderEntity? head, NewFastAssignment? assignment)
+        public void ParseStepWithEvents(NewHeaderEntity? head, NewAssignmentIgnoreAttributes? assignment)
         {
             // Start of step format
             var stepStart = MatchToken(SyntaxKind.StepOrIsoStartKeyword);
@@ -109,7 +110,7 @@ namespace Xbim.IO.Step21
             var startData = MatchToken(SyntaxKind.StepStartDataSectionKeyword);
             while (Current.Kind == SyntaxKind.StepIdentityToken)
             {
-                assignment?.Invoke(ParseFastStepEntityAssignment());
+                assignment?.Invoke(ParseStepEntityAssignmentBare());
             }
             _ = MatchToken(SyntaxKind.StepEndSectionKeyword);
             _ = MatchToken(SyntaxKind.StepOrIsoEndKeyword);
@@ -137,7 +138,7 @@ namespace Xbim.IO.Step21
             {
                 while (Current.Kind == SyntaxKind.StepIdentityToken)
                 {
-                    DataAssingments.Add(ParseFastStepEntityAssignment());
+                    DataAssingments.Add(ParseStepEntityAssignmentBare());
                 }
             }
             else
@@ -156,7 +157,7 @@ namespace Xbim.IO.Step21
                 );
         }
 
-        private StepFastEntityAssignmentSyntax ParseFastStepEntityAssignment()
+        private StepEntityAssignmentBareSyntax ParseStepEntityAssignmentBare()
         {
             var identity = MatchToken(SyntaxKind.StepIdentityToken);
             _ = MatchToken(SyntaxKind.EqualsToken);
@@ -171,10 +172,14 @@ namespace Xbim.IO.Step21
             {
                 NextToken(); // comments and strings are dealt by the lexer.
             }
-            _ = MatchToken(SyntaxKind.SemiColonToken);
+            // MatchToken populates the value of 'Current' token after the semicolon,
+            // that's why IgnoreValues needs to false in order for the next assignment to
+            // be parsed correctly.
             _lexer.IgnoreValues = false;
-            // Debug.WriteLine($"{identity}={type}");
-            return new StepFastEntityAssignmentSyntax(_source, identity, type, firstString);
+            _ = MatchToken(SyntaxKind.SemiColonToken);
+            
+            Debug.WriteLine($"{identity.Text}={type.Text}");
+            return new StepEntityAssignmentBareSyntax(_source, identity, type, firstString);
         }
 
 
@@ -195,7 +200,7 @@ namespace Xbim.IO.Step21
             return new StepEntitySyntax(_source, type, argumentList);
         }
 
-        private StepArgumentListSyntax ParseStepArgumentList()
+        private StepAttributeListSyntax ParseStepArgumentList()
         {
             var openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
             var nodesAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
@@ -221,7 +226,7 @@ namespace Xbim.IO.Step21
             var arguments = new SeparatedSyntaxList<SyntaxNode>(nodesAndSeparators.ToImmutable());
 
             var closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
-            return new StepArgumentListSyntax(_source, openParenthesisToken, arguments, closeParenthesisToken);
+            return new StepAttributeListSyntax(_source, openParenthesisToken, arguments, closeParenthesisToken);
         }
 
         private SyntaxNode ParseStepArgument()
