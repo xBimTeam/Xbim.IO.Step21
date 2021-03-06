@@ -7,40 +7,52 @@ namespace Xbim.IO.Step21
     /// A full assignment, entirely parsed
     /// E.g. #IDENTITY=ENTITY;
     /// </summary>
-    public class StepEntityAssignmentSyntax : SyntaxNode
+    public class StepEntityAssignment : StepNode
     {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public StepEntityAssignmentSyntax(Uri syntaxTree, SyntaxToken identity, StepEntitySyntax entity)
+        public StepEntityAssignment(Uri syntaxTree, StepToken identity, StepEntity entity, StepToken closing)
             : base (syntaxTree)
         {
             Identity = identity;
             Entity = entity;
+            ClosingSemicolon = closing;
         }
+
+        /// <summary>
+        /// The type of step class being assigned
+        /// </summary>
+        public StepToken ExpressType => Entity.ExpressType;
 
         /// <summary>
         /// The classification of the node
         /// </summary>
-        public override SyntaxKind Kind => SyntaxKind.StepEntityAssignment;
+        public override StepKind Kind => StepKind.StepEntityAssignment;
 
         /// <summary>
         /// The entity label being assigned
         /// </summary>
-        public SyntaxToken Identity { get; }
+        public StepToken Identity { get; }
 
         /// <summary>
         /// The value of the entity assigned
         /// </summary>
-        public StepEntitySyntax Entity { get; }
+        public StepEntity Entity { get; }
+
+        /// <summary>
+        /// The token that ends the assignment
+        /// </summary>
+        public StepToken ClosingSemicolon { get; }
 
         /// <summary>
         /// Concrete implementation listing subcomponents of the node
         /// </summary>
-        public override IEnumerable<SyntaxNode> GetChildren()
+        public override IEnumerable<StepNode> GetChildren()
         {
             yield return Identity;
             yield return Entity;
+            yield return ClosingSemicolon;
         }
     }
 }

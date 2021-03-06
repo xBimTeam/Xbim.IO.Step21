@@ -31,7 +31,6 @@ namespace Xbim.IO.Step21.Text
         /// </summary>
         public long End => Start + Length;
 
-
         internal static TextSpan FromBounds(long start, long end)
         {
             var length = (int)(end - start);
@@ -54,5 +53,11 @@ namespace Xbim.IO.Step21.Text
         /// </summary>
         /// <returns></returns>
         public override string ToString() => $"{Start}..{End}";
+
+        /// <summary>
+        /// The span expressed as 1-indexed positions, useful for comparison in notepad++
+        /// </summary>
+        /// <returns></returns>
+        public string ToNotepadString() => $"{Start+1}..{End+1}";
     }
 }

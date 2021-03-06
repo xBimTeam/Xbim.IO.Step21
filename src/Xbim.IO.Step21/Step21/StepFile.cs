@@ -7,15 +7,15 @@ namespace Xbim.IO.Step21
     /// <summary>
     /// representation syntax for an entire STEP file
     /// </summary>
-    public sealed partial class StepSyntax : SyntaxNode
+    public sealed partial class StepFile : StepNode
     {
         /// <summary>
         /// Default contructor
         /// </summary>
-        public StepSyntax(Uri syntaxTree,
-            ImmutableArray<SyntaxNode> headers,
-            ImmutableArray<SyntaxNode> members,
-            SyntaxToken endOfFileToken)
+        public StepFile(Uri syntaxTree,
+            ImmutableArray<StepNode> headers,
+            ImmutableArray<StepNode> members,
+            StepToken endOfFileToken)
             : base(syntaxTree)
         {
             Headers = headers;
@@ -26,27 +26,27 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// The classification of the node
         /// </summary>
-        public override SyntaxKind Kind => SyntaxKind.StepFileKeyword;
+        public override StepKind Kind => StepKind.StepFileKeyword;
 
         /// <summary>
         /// All members 
         /// </summary>
-        public ImmutableArray<SyntaxNode> Headers { get; }
+        public ImmutableArray<StepNode> Headers { get; }
 
         /// <summary>
         /// All members in the body section
         /// </summary>
-        public ImmutableArray<SyntaxNode> Members { get; }
+        public ImmutableArray<StepNode> Members { get; }
 
         /// <summary>
         /// The token at the end of the file
         /// </summary>
-        public SyntaxToken EndOfFileToken { get; }
+        public StepToken EndOfFileToken { get; }
 
         /// <summary>
         /// Concrete implementation listing subcomponents of the node
         /// </summary>
-        public override IEnumerable<SyntaxNode> GetChildren()
+        public override IEnumerable<StepNode> GetChildren()
         {
             foreach (var m in Members)
                 yield return m;

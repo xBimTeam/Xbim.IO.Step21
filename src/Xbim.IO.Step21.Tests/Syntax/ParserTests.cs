@@ -20,7 +20,7 @@ namespace Xbim.IO.Step21.Tests.Syntax
             var syntaxTree = StepParsing.Parse(s);
             var root = syntaxTree.Root;
             Assert.Empty(syntaxTree.Diagnostics);
-            Assert.IsType<StepSyntax>(root);
+            Assert.IsType<StepFile>(root);
             Assert.NotEmpty(root.Headers);
             Assert.NotEmpty(root.Members);
         }
@@ -32,28 +32,29 @@ namespace Xbim.IO.Step21.Tests.Syntax
             var sFast = SourceText.From(new FileInfo(fileName));
             var sFull = SourceText.From(new FileInfo(fileName));
             int headerCount = 0;
-            void OnHeaderFound(StepEntitySyntax headerEntity)
+            void OnHeaderFound(StepHeaderEntity headerEntity)
             {
                 headerCount++;
             }
-            List<needMatch> fast = new List<needMatch>();
-            void OnBareEntityFound(StepEntityAssignmentBareSyntax assignment)
+            var fast = new List<needMatch>();
+            void OnBareEntityFound(StepEntityAssignmentBare assignment)
             {
                 var found = new needMatch
                 {
                     label = Convert.ToInt32(assignment.Identity.Value),
                     type = assignment.ExpressType.Text,
-                    guid = assignment.FirstString?.Value.ToString()
+                    guid = assignment.FirstString?.Value.ToString(),
+                    span = assignment.Span.ToNotepadString()
                 };
                 fast.Add(found);
                 
             }
-            List<needMatch> full = new List<needMatch>();
-            void OnFullEntityFound(StepEntityAssignmentSyntax assignment)
+            var full = new List<needMatch>();
+            void OnFullEntityFound(StepEntityAssignment assignment)
             {
                 string t = null;
                 var first = assignment.Entity.Attributes.FirstOrDefault();
-                if (first.Kind == SyntaxKind.StepString && first is SyntaxToken tok)
+                if (first != null && first.Kind == StepKind.StepString && first is StepToken tok)
                 {
                     t = tok.Value.ToString();
                 }
@@ -61,7 +62,8 @@ namespace Xbim.IO.Step21.Tests.Syntax
                 {
                     label = Convert.ToInt32(assignment.Identity.Value),
                     type = assignment.Entity.ExpressType.Text,
-                    guid = t
+                    guid = t,
+                    span = assignment.Span.ToNotepadString()
                 };
                 full.Add(found);
             }
@@ -79,19 +81,24 @@ namespace Xbim.IO.Step21.Tests.Syntax
             {
                 Assert.Equal(fast[i], full[i]);
             }
+            Assert.Equal(19, fast.Count());
         }
 
         private class needMatch : IEquatable<needMatch>
         {
             public int label;
+            public string span = "";
             public string type;
             public string guid;
-
+            
             public bool Equals([AllowNull] needMatch other)
             {
                 if (other == null)
                     return false;
+
                 if (!label.Equals(other.label))
+                    return false;
+                if (!span.Equals(other.span))
                     return false;
                 if (!type.Equals(other.type))
                     return false;

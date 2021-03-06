@@ -3,7 +3,7 @@ namespace Xbim.IO.Step21
     /// <summary>
     /// Classifies the components of a STEP syntax
     /// </summary>
-    public enum SyntaxKind
+    public enum StepKind
     {
         // banners prepared with https://www.patorjk.com/software/taag/#p=display&f=Standard&t=Step%20parts
         /*
@@ -76,7 +76,7 @@ namespace Xbim.IO.Step21
          */
 
         /// <summary>
-        /// entire file level used in the <see cref="StepSyntax"/> class.
+        /// entire file level used in the <see cref="StepFile"/> class.
         /// </summary>
         StepFileKeyword,
         /// <summary>
@@ -162,14 +162,19 @@ namespace Xbim.IO.Step21
         StepIdentityToken, // #123 when used to define an entity
         /// <summary>
         /// When using the fast parsing option the fields within an instance are ignored
-        /// #12=IfcStuff(IGNORED);
+        /// #12=IfcStuff(guid,IGNORED_BUT_CONSUMED);
         /// </summary>
-        StepEntityAssignmentFast, // #12=IfcStuff( this is ignored, but consumed );
+        StepEntityAssignmentFast,
         /// <summary>
         /// When using the full parsing option the fields within an instance are parsed
-        /// #12=IfcStuff(CONSIDERED);
+        /// #12=IfcStuff(attributes);
         /// </summary>
         StepEntityAssignment, // #12=IfcStuff(this is parsed);
+        /// <summary>
+        /// Parsing headers has the following structure:
+        /// IfcStuff(attributes);
+        /// </summary>
+        StepHeaderEntity, // #12=IfcStuff(this is parsed);
         /// <summary>
         /// Instantiation of an entity either persisted or not
         /// </summary>

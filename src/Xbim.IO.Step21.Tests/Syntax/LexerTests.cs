@@ -14,7 +14,7 @@ namespace Xbim.IO.Step21.Tests.Syntax
             var tokens = StepParsing.ParseTokens(text, out var diagnostics);
 
             var token = Assert.Single(tokens);
-            Assert.Equal(SyntaxKind.StepString, token.Kind);
+            Assert.Equal(StepKind.StepString, token.Kind);
             Assert.Equal(text, token.Text);
 
             var diagnostic = Assert.Single(diagnostics);
@@ -34,7 +34,7 @@ namespace Xbim.IO.Step21.Tests.Syntax
             Assert.Single(tokens);
 
             var token = tokens[0];
-            Assert.Equal(SyntaxKind.StepIdentifierToken, token.Kind);
+            Assert.Equal(StepKind.StepIdentifierToken, token.Kind);
             Assert.Equal(name, token.Text);
         }
 
@@ -44,27 +44,27 @@ namespace Xbim.IO.Step21.Tests.Syntax
         [InlineData(@"TestFiles\Minimal.ifc", 0, 1E-05, "ViewDefinition [CoordinationView]", "Project ' Status", 0, -12)]
         public void LexerValues(string fileName, double firstFloat, double lastFloat, string firstString, string lastString, int firstInt, int lastInt)
         {
-            FileInfo f = new FileInfo(fileName);
+            var f = new FileInfo(fileName);
             var allfile = File.ReadAllText(fileName);
             SourceText st2 = SourceText.From(allfile, new System.Uri(f.FullName));
             var tokens = StepParsing.ParseTokens(st2);
 
             // floats
-            var toCheck = tokens.FirstOrDefault(x => x.Kind == SyntaxKind.StepFloat);
+            var toCheck = tokens.FirstOrDefault(x => x.Kind == StepKind.StepFloat);
             Assert.Equal(firstFloat, toCheck.Value);
-            toCheck = tokens.LastOrDefault(x => x.Kind == SyntaxKind.StepFloat);
+            toCheck = tokens.LastOrDefault(x => x.Kind == StepKind.StepFloat);
             Assert.Equal(lastFloat, toCheck.Value);
 
             // ints
-            toCheck = tokens.FirstOrDefault(x => x.Kind == SyntaxKind.StepInteger);
+            toCheck = tokens.FirstOrDefault(x => x.Kind == StepKind.StepInteger);
             Assert.Equal(firstInt, toCheck.Value);
-            toCheck = tokens.LastOrDefault(x => x.Kind == SyntaxKind.StepInteger);
+            toCheck = tokens.LastOrDefault(x => x.Kind == StepKind.StepInteger);
             Assert.Equal(lastInt, toCheck.Value);
 
             // strings
-            toCheck = tokens.FirstOrDefault(x => x.Kind == SyntaxKind.StepString);
+            toCheck = tokens.FirstOrDefault(x => x.Kind == StepKind.StepString);
             Assert.Equal(firstString, toCheck.Value);
-            toCheck = tokens.LastOrDefault(x => x.Kind == SyntaxKind.StepString);
+            toCheck = tokens.LastOrDefault(x => x.Kind == StepKind.StepString);
             Assert.Equal(lastString, toCheck.Value);
         }
     }

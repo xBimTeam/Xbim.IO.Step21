@@ -12,48 +12,48 @@ namespace Xbim.IO.Step21
     /// Triggered when encountering new header entities 
     /// </summary>
     /// <param name="headerEntityFound">data of the entity encountered</param>
-    public delegate void NewHeaderEntity(StepEntitySyntax headerEntityFound);
+    public delegate void NewHeaderEntity(StepHeaderEntity headerEntityFound);
 
     /// <summary>
     /// Triggered when encountering new body entities
     /// </summary>
     /// <param name="AssignmentFound">simplified data of the entity encountered</param>
-    public delegate void NewAssignmentIgnoreAttributes(StepEntityAssignmentBareSyntax AssignmentFound);
+    public delegate void NewAssignmentIgnoreAttributes(StepEntityAssignmentBare AssignmentFound);
 
     /// <summary>
     /// Triggered when encountering new body entities
     /// </summary>
     /// <param name="assignmentFound">data of the entity encountered</param>
-    public delegate void NewAssignment(StepEntityAssignmentSyntax assignmentFound);
+    public delegate void NewAssignment(StepEntityAssignment assignmentFound);
     
     internal sealed class Parser
     {
-        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
+        private readonly DiagnosticBag _diagnostics = new();
         private readonly Uri _source;
         readonly Lexer _lexer;
 
-        public Parser(ISourceText syntaxTree) 
+        public Parser(ISourceText source) 
         {
-            _lexer = new Lexer(syntaxTree);
+            _lexer = new Lexer(source);
             Current = FirstNonTrivia();
-            _source = syntaxTree.Source;
+            _source = source.Source;
         }
 
-        private SyntaxToken FirstNonTrivia()
+        private StepToken FirstNonTrivia()
         {
-            var c = _lexer.Lex();
-            while (c.Kind.IsTrivia()) // EOF is not trivia so it always exits
+            var nextToken = _lexer.Lex();
+            while (nextToken.Kind.IsTrivia()) // EOF is not trivia so it always exits
             {
-                c = _lexer.Lex();
+                nextToken = _lexer.Lex();
             }
-            return c;
+            return nextToken;
         }
 
-        public DiagnosticBag Diagnostics => new DiagnosticBag(_lexer.Diagnostics, _diagnostics);
+        public DiagnosticBag Diagnostics => new(_lexer.Diagnostics, _diagnostics);
 
-        private SyntaxToken Current { get; set; }
+        private StepToken Current { get; set; }
 
-        private SyntaxToken NextToken()
+        private StepToken NextToken()
         {
             var current = Current;
             Current = FirstNonTrivia();
@@ -61,13 +61,13 @@ namespace Xbim.IO.Step21
         }
 
 
-        private SyntaxToken MatchToken(SyntaxKind kind)
+        private StepToken MatchToken(StepKind kind)
         {
             if (Current.Kind == kind)
                 return NextToken();
 
             _diagnostics.ReportUnexpectedToken(Current.GetLocation(), Current.Kind, kind);
-            return new SyntaxToken(_source, kind, Current.Position, null, null);
+            return new StepToken(_source, kind, Current.Position, null, null);
         }
 
         public bool QuickParse { get; set; } = false;
@@ -75,147 +75,157 @@ namespace Xbim.IO.Step21
         public void ParseStepWithEvents(NewHeaderEntity? head, NewAssignment? assignment)
         {
             // Start of step format
-            var stepStart = MatchToken(SyntaxKind.StepOrIsoStartKeyword);
-            var headerStart = MatchToken(SyntaxKind.StepStartHeaderSectionKeyword);
+            var stepStart = MatchToken(StepKind.StepOrIsoStartKeyword);
+            var headerStart = MatchToken(StepKind.StepStartHeaderSectionKeyword);
 
-            while (Current.Kind == SyntaxKind.StepIdentifierToken)
+            while (Current.Kind == StepKind.StepIdentifierToken)
             {
-                var headerEntity = ParseStepEntity();
+                var headerEntity = ParseHeaderEntity();
                 head?.Invoke(headerEntity);
-                _ = MatchToken(SyntaxKind.SemiColonToken);
             }
-            var endH = MatchToken(SyntaxKind.StepEndSectionKeyword);
-            var startData = MatchToken(SyntaxKind.StepStartDataSectionKeyword);           
-            while (Current.Kind == SyntaxKind.StepIdentityToken)
+            var endH = MatchToken(StepKind.StepEndSectionKeyword);
+            var startData = MatchToken(StepKind.StepStartDataSectionKeyword);           
+            while (Current.Kind == StepKind.StepIdentityToken)
             {
                 assignment?.Invoke(ParseStepEntityAssignment());
             }
-            _ = MatchToken(SyntaxKind.StepEndSectionKeyword);
-            _ = MatchToken(SyntaxKind.StepOrIsoEndKeyword);
+            _ = MatchToken(StepKind.StepEndSectionKeyword);
+            _ = MatchToken(StepKind.StepOrIsoEndKeyword);
         }
 
         public void ParseStepWithEvents(NewHeaderEntity? head, NewAssignmentIgnoreAttributes? assignment)
         {
             // Start of step format
-            var stepStart = MatchToken(SyntaxKind.StepOrIsoStartKeyword);
-            var headerStart = MatchToken(SyntaxKind.StepStartHeaderSectionKeyword);
+            var stepStart = MatchToken(StepKind.StepOrIsoStartKeyword);
+            var headerStart = MatchToken(StepKind.StepStartHeaderSectionKeyword);
 
-            while (Current.Kind == SyntaxKind.StepIdentifierToken)
+            while (Current.Kind == StepKind.StepIdentifierToken)
             {
-                var headerEntity = ParseStepEntity();
+                var headerEntity = ParseHeaderEntity();
                 head?.Invoke(headerEntity);
-                _ = MatchToken(SyntaxKind.SemiColonToken);
             }
-            var endH = MatchToken(SyntaxKind.StepEndSectionKeyword);
-            var startData = MatchToken(SyntaxKind.StepStartDataSectionKeyword);
-            while (Current.Kind == SyntaxKind.StepIdentityToken)
+            var endH = MatchToken(StepKind.StepEndSectionKeyword);
+            var startData = MatchToken(StepKind.StepStartDataSectionKeyword);
+            while (Current.Kind == StepKind.StepIdentityToken)
             {
                 assignment?.Invoke(ParseStepEntityAssignmentBare());
             }
-            _ = MatchToken(SyntaxKind.StepEndSectionKeyword);
-            _ = MatchToken(SyntaxKind.StepOrIsoEndKeyword);
+            _ = MatchToken(StepKind.StepEndSectionKeyword);
+            _ = MatchToken(StepKind.StepOrIsoEndKeyword);
         }
 
 
-        public StepSyntax ParseStep()
+        public StepFile ParseStep()
         {
             // Start of step format
-            _ = MatchToken(SyntaxKind.StepOrIsoStartKeyword);
-            _ = MatchToken(SyntaxKind.StepStartHeaderSectionKeyword);
+            _ = MatchToken(StepKind.StepOrIsoStartKeyword);
+            _ = MatchToken(StepKind.StepStartHeaderSectionKeyword);
 
-            var headerEntities = ImmutableArray.CreateBuilder<SyntaxNode>();
-            while (Current.Kind == SyntaxKind.StepIdentifierToken)
+            var headerEntities = ImmutableArray.CreateBuilder<StepNode>();
+            while (Current.Kind == StepKind.StepIdentifierToken)
             {
                 var headerEntity = ParseStepEntity();
                 headerEntities.Add(headerEntity);
-                _ = MatchToken(SyntaxKind.SemiColonToken);
+                _ = MatchToken(StepKind.SemiColonToken);
             }
 
-            _ = MatchToken(SyntaxKind.StepEndSectionKeyword);
-            _ = MatchToken(SyntaxKind.StepStartDataSectionKeyword);
-            var DataAssingments = ImmutableArray.CreateBuilder<SyntaxNode>();
+            _ = MatchToken(StepKind.StepEndSectionKeyword);
+            _ = MatchToken(StepKind.StepStartDataSectionKeyword);
+            var DataAssingments = ImmutableArray.CreateBuilder<StepNode>();
             if (QuickParse) // test only once, then do the loop
             {
-                while (Current.Kind == SyntaxKind.StepIdentityToken)
+                while (Current.Kind == StepKind.StepIdentityToken)
                 {
                     DataAssingments.Add(ParseStepEntityAssignmentBare());
                 }
             }
             else
             {
-                while (Current.Kind == SyntaxKind.StepIdentityToken)
+                while (Current.Kind == StepKind.StepIdentityToken)
                 {
                     DataAssingments.Add(ParseStepEntityAssignment());
                 }
             }
-            _ = MatchToken(SyntaxKind.StepEndSectionKeyword);
-            var end = MatchToken(SyntaxKind.StepOrIsoEndKeyword);
-            return new StepSyntax(_source,
+            _ = MatchToken(StepKind.StepEndSectionKeyword);
+            var end = MatchToken(StepKind.StepOrIsoEndKeyword);
+            return new StepFile(_source,
                 headerEntities.ToImmutableArray(),
                 DataAssingments.ToImmutableArray(),
                 end
                 );
         }
 
-        private StepEntityAssignmentBareSyntax ParseStepEntityAssignmentBare()
+        private StepEntityAssignmentBare ParseStepEntityAssignmentBare()
         {
-            var identity = MatchToken(SyntaxKind.StepIdentityToken);
-            _ = MatchToken(SyntaxKind.EqualsToken);
-            var type = MatchToken(SyntaxKind.StepIdentifierToken);
-            _ = MatchToken(SyntaxKind.OpenParenthesisToken);
-            SyntaxToken? firstString = null;
-            if (Current.Kind == SyntaxKind.StepString)
-                firstString = MatchToken(SyntaxKind.StepString);
+            var identity = MatchToken(StepKind.StepIdentityToken);
+            _ = MatchToken(StepKind.EqualsToken);
+            var type = MatchToken(StepKind.StepIdentifierToken);
+            _ = MatchToken(StepKind.OpenParenthesisToken);
+            StepToken? firstString = null;
+            if (Current.Kind == StepKind.StepString)
+                firstString = MatchToken(StepKind.StepString);
 
             _lexer.IgnoreValues = true;
-            while (Current.Kind != SyntaxKind.SemiColonToken)
+            while (Current.Kind != StepKind.SemiColonToken)
             {
                 NextToken(); // comments and strings are dealt by the lexer.
             }
             // MatchToken populates the value of 'Current' token after the semicolon,
             // that's why IgnoreValues needs to false in order for the next assignment to
-            // be parsed correctly.
+            // be parsed correctly.           
             _lexer.IgnoreValues = false;
-            _ = MatchToken(SyntaxKind.SemiColonToken);
+
+            // the semicolon token is a special case that gets the text from the
+            // syntaxfacts class, so it's span is correctly evaluated even if ignoreValues
+            // was set when it was first parsed in the loop of NextToken() above.
+            var closing = MatchToken(StepKind.SemiColonToken);
             
             Debug.WriteLine($"{identity.Text}={type.Text}");
-            return new StepEntityAssignmentBareSyntax(_source, identity, type, firstString);
+            return new StepEntityAssignmentBare(_source, identity, type, firstString, closing);
         }
 
 
-        private StepEntityAssignmentSyntax ParseStepEntityAssignment()
+        internal StepEntityAssignment ParseStepEntityAssignment()
         {
-            var identity = MatchToken(SyntaxKind.StepIdentityToken);
-            _ = MatchToken(SyntaxKind.EqualsToken);
+            var identity = MatchToken(StepKind.StepIdentityToken);
+            _ = MatchToken(StepKind.EqualsToken);
             var entity = ParseStepEntity();
-            _ = MatchToken(SyntaxKind.SemiColonToken);
-            return new StepEntityAssignmentSyntax(_source, identity, entity);
+            var closing = MatchToken(StepKind.SemiColonToken);
+            return new StepEntityAssignment(_source, identity, entity, closing);
         }
 
-        private StepEntitySyntax ParseStepEntity()
+
+        private StepHeaderEntity ParseHeaderEntity()
+        {
+            var ent = ParseStepEntity();
+            var closing = MatchToken(StepKind.SemiColonToken);
+            return new StepHeaderEntity(_source, ent, closing);
+        }
+
+        private StepEntity ParseStepEntity()
         {
             // todo: complex should start here
-            var type = MatchToken(SyntaxKind.StepIdentifierToken);
+            var type = MatchToken(StepKind.StepIdentifierToken);
             var argumentList = ParseStepArgumentList();
-            return new StepEntitySyntax(_source, type, argumentList);
+            return new StepEntity(_source, type, argumentList);
         }
 
-        private StepAttributeListSyntax ParseStepArgumentList()
+        private StepAttributeList ParseStepArgumentList()
         {
-            var openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
-            var nodesAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
+            var openParenthesisToken = MatchToken(StepKind.OpenParenthesisToken);
+            var nodesAndSeparators = ImmutableArray.CreateBuilder<StepNode>();
 
             var parseNextArgument = true;
             while (parseNextArgument &&
-                   Current.Kind != SyntaxKind.CloseParenthesisToken &&
-                   Current.Kind != SyntaxKind.EndOfFileToken)
+                   Current.Kind != StepKind.CloseParenthesisToken &&
+                   Current.Kind != StepKind.EndOfFileToken)
             {
                 var arg = ParseStepArgument();
                 nodesAndSeparators.Add(arg);
 
-                if (Current.Kind == SyntaxKind.CommaToken)
+                if (Current.Kind == StepKind.CommaToken)
                 {
-                    var comma = MatchToken(SyntaxKind.CommaToken);
+                    var comma = MatchToken(StepKind.CommaToken);
                     nodesAndSeparators.Add(comma);
                 }
                 else
@@ -223,29 +233,29 @@ namespace Xbim.IO.Step21
                     parseNextArgument = false;
                 }
             }
-            var arguments = new SeparatedSyntaxList<SyntaxNode>(nodesAndSeparators.ToImmutable());
+            var arguments = new SeparatedNodeList<StepNode>(nodesAndSeparators.ToImmutable());
 
-            var closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
-            return new StepAttributeListSyntax(_source, openParenthesisToken, arguments, closeParenthesisToken);
+            var closeParenthesisToken = MatchToken(StepKind.CloseParenthesisToken);
+            return new StepAttributeList(_source, openParenthesisToken, arguments, closeParenthesisToken);
         }
 
-        private SyntaxNode ParseStepArgument()
+        private StepNode ParseStepArgument()
         {
             switch (Current.Kind)
             {
-                case SyntaxKind.StepIdentityToken:
-                case SyntaxKind.StepInteger:
-                case SyntaxKind.StepFloat:
-                case SyntaxKind.StepString:
-                case SyntaxKind.StepBoolean:
-                case SyntaxKind.StepEnumeration:
-                case SyntaxKind.StepHex:
-                case SyntaxKind.StepUndefined:
-                case SyntaxKind.StepOverride:
+                case StepKind.StepIdentityToken:
+                case StepKind.StepInteger:
+                case StepKind.StepFloat:
+                case StepKind.StepString:
+                case StepKind.StepBoolean:
+                case StepKind.StepEnumeration:
+                case StepKind.StepHex:
+                case StepKind.StepUndefined:
+                case StepKind.StepOverride:
                     return NextToken();
-                case SyntaxKind.OpenParenthesisToken:
+                case StepKind.OpenParenthesisToken:
                     return ParseStepArgumentList();
-                case SyntaxKind.StepIdentifierToken:
+                case StepKind.StepIdentifierToken:
                     return ParseStepEntity();
             }
 
@@ -255,7 +265,7 @@ namespace Xbim.IO.Step21
             // new StepArgumentErrorSyntax consumes Current
             // 
             _diagnostics.ReportUnexpectedToken(Current.GetLocation(), Current.Kind, "StepArgument");
-            return new StepArgumentErrorSyntax(_source, Current);
+            return new StepArgumentError(_source, Current);
         }   
     }
 }

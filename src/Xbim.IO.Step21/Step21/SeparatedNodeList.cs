@@ -8,28 +8,28 @@ namespace Xbim.IO.Step21
     /// <summary>
     /// Convenience class to manage lists
     /// </summary>
-    public abstract class SeparatedSyntaxList
+    public abstract class SeparatedNodeList
     {
         /// <summary>
         /// returns both separated and separator nodes.
         /// </summary>
-        public abstract ImmutableArray<SyntaxNode> GetWithSeparators();
+        public abstract ImmutableArray<StepNode> GetWithSeparators();
     }
 
 
     /// <summary>
     /// Convenience generic class to manage lists
     /// </summary>
-    public sealed class SeparatedSyntaxList<T> : SeparatedSyntaxList, IEnumerable<T>
-        where T: SyntaxNode
+    public sealed class SeparatedNodeList<T> : SeparatedNodeList, IEnumerable<T>
+        where T: StepNode
     {
-        private readonly ImmutableArray<SyntaxNode> _nodesAndSeparators;
+        private readonly ImmutableArray<StepNode> _nodesAndSeparators;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         /// <param name="nodesAndSeparators"></param>
-        public SeparatedSyntaxList(ImmutableArray<SyntaxNode> nodesAndSeparators)
+        public SeparatedNodeList(ImmutableArray<StepNode> nodesAndSeparators)
         {
             _nodesAndSeparators = nodesAndSeparators;
         }
@@ -49,17 +49,17 @@ namespace Xbim.IO.Step21
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public SyntaxToken GetSeparator(int index)
+        public StepToken GetSeparator(int index)
         {
             if (index < 0 || index >= Count - 1)
                 throw new ArgumentOutOfRangeException(nameof(index));
-            return (SyntaxToken) _nodesAndSeparators[index * 2 + 1];
+            return (StepToken) _nodesAndSeparators[index * 2 + 1];
         }
 
         /// <summary>
         /// returns both separated and separator nodes.
         /// </summary>
-        public override ImmutableArray<SyntaxNode> GetWithSeparators() => _nodesAndSeparators;
+        public override ImmutableArray<StepNode> GetWithSeparators() => _nodesAndSeparators;
 
         /// <summary>
         /// enumerator of separated nodes, ignores separators

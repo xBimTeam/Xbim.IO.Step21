@@ -14,12 +14,12 @@ namespace Xbim.IO.Step21.Tests.Spans
         [InlineData(@"TestFiles\Numeric.ifc")]
         public void ReadsSameThanSourceText(string filename)
         {
-            FileInfo f = new FileInfo(filename);
+            var f = new FileInfo(filename);
 
             // ///////////////////  COPY & PASTE RISK ////////// ///
             // this function is setting the buffer to a tiny value for testing purposes.
             // Don't do this in release, it's very slow
-            using BufferedUri st = new BufferedUri(f, 2);
+            using var st = new BufferedUri(f, 2);
             var tokens1 = StepParsing.ParseTokens(st, out var diagnostics).ToArray();
             var allfile = File.ReadAllText(filename);
             SourceText st2 = SourceText.From(allfile, new System.Uri(f.FullName));
@@ -40,7 +40,7 @@ namespace Xbim.IO.Step21.Tests.Spans
                     Debug.WriteLine($"- {tl}");
                     Assert.Equal(enum1[i].Text, enum2[i].Text);
                 }
-                if (enum1[i].Kind == SyntaxKind.StepFloat)
+                if (enum1[i].Kind == StepKind.StepFloat)
                 {
                     Debug.WriteLine($"{enum1[i].Value} {enum2[i].GetLocation()}");
                 }
@@ -52,28 +52,28 @@ namespace Xbim.IO.Step21.Tests.Spans
         [InlineData(@"TestFiles\Minimal.ifc")]
         public void CanBuffer(string filename)
         {
-            FileInfo f = new FileInfo(filename);
-            using BufferedUri st = new BufferedUri(f);
+            var f = new FileInfo(filename);
+            using var st = new BufferedUri(f);
             var res = StepParsing.Parse(st);
             Assert.False(res.Diagnostics.Any());
         }
 
         [Theory]
         [InlineData(@"TestFiles\Duplex_A.subset.ifc", 3, 125)]
-        [InlineData(@"TestFiles\Minimal.ifc", 3, 20)]
+        [InlineData(@"TestFiles\Minimal.ifc", 3, 19)]
         public void FastBuffer(string filename, int head, int ent)
         {
-            FileInfo f = new FileInfo(filename);
+            var f = new FileInfo(filename);
             using var st = new BufferedUri(f);
             int entityCount = 0;
             int headerCount = 0;
 
-            void NewHeaderEntity(StepEntitySyntax headerEntity)
+            void NewHeaderEntity(StepHeaderEntity headerEntity)
             {
                 headerCount++;
             }
 
-            void NewEntityAssignment(StepEntityAssignmentSyntax assignment)
+            void NewEntityAssignment(StepEntityAssignment assignment)
             {
                 entityCount++;
             }

@@ -66,7 +66,7 @@ public class ProgressBar : IDisposable, IProgress<double>
         }
 
         // Backtrack to the first differing character
-        StringBuilder outputBuilder = new StringBuilder();
+        var outputBuilder = new StringBuilder();
         outputBuilder.Append('\b', _currentText.Length - commonPrefixLength);
 
         // Output new suffix

@@ -7,19 +7,20 @@ namespace Xbim.IO.Step21
     /// Argument lists of an entity
     /// E.G.: (ARG1, ARG2, ..., ARGn)
     /// </summary>
-    public class StepAttributeListSyntax : SyntaxNode
+    public class StepAttributeList : StepNode
     {
+        
+        private readonly StepToken _openParenthesisToken;
         /// <summary>
-        /// 
+        /// Attributes defined in the list
         /// </summary>
-        private readonly SyntaxToken _openParenthesisToken;
-        public readonly SeparatedSyntaxList<SyntaxNode> Attributes;
-        private readonly SyntaxToken _closeParenthesisToken;
+        public readonly SeparatedNodeList<StepNode> Attributes;
+        private readonly StepToken _closeParenthesisToken;
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public StepAttributeListSyntax(Uri syntaxTree, SyntaxToken openParenthesisToken, SeparatedSyntaxList<SyntaxNode> arguments, SyntaxToken closeParenthesisToken)
+        public StepAttributeList(Uri syntaxTree, StepToken openParenthesisToken, SeparatedNodeList<StepNode> arguments, StepToken closeParenthesisToken)
             : base (syntaxTree)
         {
             this._openParenthesisToken = openParenthesisToken;
@@ -30,12 +31,12 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// The classification of the node
         /// </summary>
-        public override SyntaxKind Kind => SyntaxKind.StepArgumentsList;
+        public override StepKind Kind => StepKind.StepArgumentsList;
 
         /// <summary>
         /// Concrete implementation listing subcomponents of the node
         /// </summary>
-        public override IEnumerable<SyntaxNode> GetChildren()
+        public override IEnumerable<StepNode> GetChildren()
         {
             yield return _openParenthesisToken;
             foreach (var argument in Attributes)
@@ -43,7 +44,6 @@ namespace Xbim.IO.Step21
                 yield return argument;
             }
             yield return _closeParenthesisToken;
-
         }
     }
 }

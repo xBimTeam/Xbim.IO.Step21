@@ -10,12 +10,12 @@ namespace Xbim.IO.Step21
     /// <summary>
     /// Base abstract class shared by all the nodes in the syntax.
     /// </summary>
-    public abstract class SyntaxNode
+    public abstract class StepNode
     {
         /// <summary>
         /// Default constructor
         /// </summary>
-        protected SyntaxNode(Uri source)
+        protected StepNode(Uri source)
         {
             Source = source;
         }
@@ -28,7 +28,7 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// The classification of the node
         /// </summary>
-        public abstract SyntaxKind Kind { get; }
+        public abstract StepKind Kind { get; }
 
         /// <summary>
         /// Allows the localization of the node
@@ -71,14 +71,14 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Subcomponents of the node
         /// </summary>
-        public abstract IEnumerable<SyntaxNode> GetChildren();
+        public abstract IEnumerable<StepNode> GetChildren();
 
         /// <summary>
         /// Last of the node components
         /// </summary>
-        public SyntaxToken GetLastToken()
+        public StepToken GetLastToken()
         {
-            if (this is SyntaxToken token)
+            if (this is StepToken token)
                 return token;
 
             // A syntax node should always contain at least 1 token.
@@ -94,7 +94,7 @@ namespace Xbim.IO.Step21
         }
 
         
-        private static void PrettyPrint(TextWriter writer, SyntaxNode node, string indent = "", bool isLast = true)
+        private static void PrettyPrint(TextWriter writer, StepNode node, string indent = "", bool isLast = true)
         {
             var isToConsole = writer == Console.Out;
             var marker = isLast ? "└──" : "├──";
@@ -106,18 +106,18 @@ namespace Xbim.IO.Step21
             writer.Write(marker);
 
             if (isToConsole)
-                Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Blue : ConsoleColor.Cyan;
+                Console.ForegroundColor = node is StepToken ? ConsoleColor.Blue : ConsoleColor.Cyan;
 
             writer.Write(node.Kind);
 
-            if (node is SyntaxToken t)
+            if (node is StepToken t)
             {
                 if (t.Value != null)
                 {
                     writer.Write(" ");
                     writer.Write(t.Value);
                 }
-                else if (t.Kind == SyntaxKind.StepIdentifierToken)
+                else if (t.Kind == StepKind.StepIdentifierToken)
                 {
                     writer.Write(" ");
                     writer.Write(t.Text);

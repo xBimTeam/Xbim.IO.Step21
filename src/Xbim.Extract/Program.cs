@@ -34,6 +34,7 @@ namespace Xbim.Extract
             NotImplemented = 1,
             CommandLineError = 2,
             NotFoundError = 4,
+            Exception = 8,
         }
 
     }

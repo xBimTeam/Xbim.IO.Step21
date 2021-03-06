@@ -2,7 +2,7 @@
   "profiles": {
     "Xbim.Extract": {
       "commandName": "Project",
-      "commandLineArgs": "strip \"C:\\Data\\Dev\\Xbim50\\Xbim.IO.Step21\\src\\Xbim.IO.Step21.Tests\\TestFiles\\Minimal.ifc\" -e 7899"
+      "commandLineArgs": "strip \"C:\\Data\\Dev\\Xbim50\\Xbim.IO.Step21\\src\\Xbim.IO.Step21.Tests\\TestFiles\\Duplex_A.subset.ifc\" -r 5543"
     }
   }
 }

@@ -7,7 +7,6 @@ ENDSEC;
 /* Some comment here */
 DATA;
 #1=/* Some comment here */IFCORGANIZATION($,'Org',$,$,$); /* Some comment here */
-#2=IFCAPPLICATION(#1,'2011','App','Short');
 #3=IFCCARTESIANPOINT((0.,0.,0.));
 #15=IFCSIUNIT(*,.LENGTHUNIT.,$,.METRE.);
 #16=IFCSIUNIT(*,.AREAUNIT.,$,.SQUARE_METRE.);
@@ -24,7 +23,7 @@ DATA;
 #30=IFCPERSON($,$,'cskender',$,$,$,$,$);
 #31=IFCORGANIZATION($,'','',$,$);
 #32=IFCPERSONANDORGANIZATION(#30,#31,$);
-#33=IFCOWNERHISTORY(#32,#2,$,.NOCHANGE.,$,$,$,-12);
+#33=IFCOWNERHISTORY(#32,IFCAPPLICATION(#1,'2011','App','Short'),$,.NOCHANGE.,$,$,$,-12);
 #34=IFCPROJECT('1xS3BCk291UvhgP2a6eflL',#33,'0001',$,$,'Duplex Apartment','Project '' Status',(#27,#28),#23);
 ENDSEC;
 END-ISO-10303-21;

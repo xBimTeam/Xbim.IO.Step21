@@ -29,7 +29,7 @@ namespace Xbim.Extract
 
         internal static Status Run(ParseOptions opts)
         {
-            FileInfo f = new FileInfo(opts.FileName);
+            var f = new FileInfo(opts.FileName);
             if (!f.Exists)
             {
                 Console.WriteLine($"File not found: {f.FullName}");
@@ -61,7 +61,7 @@ namespace Xbim.Extract
             int entityCount = 0;
             int headerCount = 0;
 
-            void NewHeaderEntity(StepEntitySyntax headerEntity)
+            void NewHeaderEntity(StepHeaderEntity headerEntity)
             {
                 headerCount++;
             }
@@ -71,7 +71,7 @@ namespace Xbim.Extract
             {
                 using (var progress = new ProgressBar())
                 {
-                    void NewEntityAssignment(StepEntityAssignmentSyntax assignment)
+                    void NewEntityAssignment(StepEntityAssignment assignment)
                     {
                         entityCount++;
                         if (entityCount % 1000 == 0)
@@ -99,7 +99,7 @@ namespace Xbim.Extract
             {
                 using (var progress = new ProgressBar())
                 {
-                    void FastEntityAssignment(StepEntityAssignmentBareSyntax assignment)
+                    void FastEntityAssignment(StepEntityAssignmentBare assignment)
                     {
                         entityCount++;
                         if (entityCount % 1000 == 0)
@@ -111,9 +111,9 @@ namespace Xbim.Extract
                     }
                     entityCount = 0;
                     headerCount = 0;
-                    Stopwatch s = new Stopwatch();
+                    var s = new Stopwatch();
                     s.Start();
-                    using (BufferedUri st = new BufferedUri(f))
+                    using (var st = new BufferedUri(f))
                     {
                         res = StepParsing.ParseWithEvents(st, NewHeaderEntity, FastEntityAssignment);
                         s.Stop();

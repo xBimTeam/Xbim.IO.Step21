@@ -3,54 +3,55 @@ namespace Xbim.IO.Step21
     /// <summary>
     /// Convenience class defining STEP syntax information.
     /// </summary>
-    public static class SyntaxFacts
+    public static class StepFacts
     {
         /// <summary>
         /// Helper method to deterime if a kind is of type comment
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
-        public static bool IsComment(this SyntaxKind kind)
+        public static bool IsComment(this StepKind kind)
         {
-            return kind == SyntaxKind.MultiLineCommentTrivia;
+            return kind == StepKind.MultiLineCommentTrivia;
         }
 
         /// <summary>
         /// Helper method to get kind from from special string
         /// </summary>
-        public static SyntaxKind GetKeywordKind(string text)
+        public static StepKind GetKeywordKind(string text)
         {
             switch (text)
             {
                 case "STEP":
-                    return SyntaxKind.StepOrIsoStartKeyword;
+                    return StepKind.StepOrIsoStartKeyword;
                 case "HEADER":
-                    return SyntaxKind.StepStartHeaderSectionKeyword;
+                    return StepKind.StepStartHeaderSectionKeyword;
                 case "ENDSEC":
-                    return SyntaxKind.StepEndSectionKeyword;
+                    return StepKind.StepEndSectionKeyword;
                 case "DATA":
-                    return SyntaxKind.StepStartDataSectionKeyword;
+                    return StepKind.StepStartDataSectionKeyword;
                 case "ENDSTEP":
-                    return SyntaxKind.StepOrIsoEndKeyword;
+                    return StepKind.StepOrIsoEndKeyword;
             }
             if (text.StartsWith("ISO"))
-                return SyntaxKind.StepOrIsoStartKeyword;
+                return StepKind.StepOrIsoStartKeyword;
             if (text.StartsWith("END-ISO"))
-                return SyntaxKind.StepOrIsoEndKeyword;
-            return SyntaxKind.StepIdentifierToken;
+                return StepKind.StepOrIsoEndKeyword;
+            return StepKind.StepIdentifierToken;
         }
 
         /// <summary>
         /// Specific kinds have direct mapping to string
         /// </summary>
-        public static string? GetText(SyntaxKind kind)
+        public static string? GetText(StepKind kind)
         {
             return kind switch
             {
-                SyntaxKind.EqualsToken => "=",
-                SyntaxKind.OpenParenthesisToken => "(",
-                SyntaxKind.CloseParenthesisToken => ")",
-                SyntaxKind.CommaToken => ",",
+                StepKind.EqualsToken => "=",
+                StepKind.SemiColonToken => ";",
+                StepKind.OpenParenthesisToken => "(",
+                StepKind.CloseParenthesisToken => ")",
+                StepKind.CommaToken => ",",
                 _ => null,
             };
         }
@@ -58,13 +59,13 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Helper method to deterime if a kind is of type trivia
         /// </summary>
-        public static bool IsTrivia(this SyntaxKind kind)
+        public static bool IsTrivia(this StepKind kind)
         {
             return kind switch
             {
-                SyntaxKind.BadTokenTrivia
-                    or SyntaxKind.WhitespaceTrivia
-                    or SyntaxKind.MultiLineCommentTrivia => true,
+                StepKind.BadTokenTrivia
+                    or StepKind.WhitespaceTrivia
+                    or StepKind.MultiLineCommentTrivia => true,
                 _ => false,
             };
         }
@@ -72,7 +73,7 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Helper method to deterime if a kind is of type keyword
         /// </summary>
-        public static bool IsKeyword(this SyntaxKind kind)
+        public static bool IsKeyword(this StepKind kind)
         {
             return kind.ToString().EndsWith("Keyword");
         }

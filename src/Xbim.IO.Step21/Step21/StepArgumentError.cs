@@ -6,12 +6,12 @@ namespace Xbim.IO.Step21
     /// <summary>
     /// Provides structure of an unexpected sequence in the data
     /// </summary>
-    public class StepArgumentErrorSyntax : SyntaxNode
+    public class StepArgumentError : StepNode
     {
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public StepArgumentErrorSyntax(Uri syntaxTree, SyntaxToken value)
+        public StepArgumentError(Uri syntaxTree, StepToken value)
             : base(syntaxTree)
         {
             Value = value;
@@ -20,17 +20,17 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// The classification of the node
         /// </summary>
-        public override SyntaxKind Kind => SyntaxKind.StepArgumentError;
+        public override StepKind Kind => StepKind.StepArgumentError;
 
         /// <summary>
         /// The unexpected token found
         /// </summary>
-        public SyntaxToken Value { get; }
+        public StepToken Value { get; }
 
         /// <summary>
         /// The unexpected token found is the only component of the syntax.
         /// </summary>
-        public override IEnumerable<SyntaxNode> GetChildren()
+        public override IEnumerable<StepNode> GetChildren()
         {
             yield return Value;
         }

@@ -12,7 +12,7 @@ namespace Xbim.IO.Step21
     /// </summary>
     public sealed class StepParsing
     {
-        private delegate void ParseHandler(ISourceText sourceText, out StepSyntax root, out ImmutableArray<Diagnostic> diagnostics);
+        private delegate void ParseHandler(ISourceText sourceText, out StepFile root, out ImmutableArray<Diagnostic> diagnostics);
 
         private StepParsing(ISourceText text, ParseHandler stepSyntaxGenerator)
         {
@@ -31,7 +31,7 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Returns the root node of the file hierarchy.
         /// </summary>
-        public StepSyntax Root { get; }
+        public StepFile Root { get; }
 
         /// <summary>
         /// Static metod to get the parsing from a filename
@@ -44,7 +44,7 @@ namespace Xbim.IO.Step21
             return Parse(sourceText);
         }
 
-        private static void Parse(ISourceText sourceText, out StepSyntax root, out ImmutableArray<Diagnostic> diagnostics)
+        private static void Parse(ISourceText sourceText, out StepFile root, out ImmutableArray<Diagnostic> diagnostics)
         {
             var parser = new Parser(sourceText);
             root = parser.ParseStep();
@@ -71,35 +71,35 @@ namespace Xbim.IO.Step21
         }
 
 
-        internal static ImmutableArray<SyntaxToken> ParseTokens(string text)
+        internal static ImmutableArray<StepToken> ParseTokens(string text)
         {
             var sourceText = SourceText.From(text);
             return ParseTokens(sourceText);
         }
 
-        internal static ImmutableArray<SyntaxToken> ParseTokens(string text, out ImmutableArray<Diagnostic> diagnostics)
+        internal static ImmutableArray<StepToken> ParseTokens(string text, out ImmutableArray<Diagnostic> diagnostics)
         {
             var sourceText = SourceText.From(text);
             return ParseTokens(sourceText, out diagnostics);
         }
 
-        internal static ImmutableArray<SyntaxToken> ParseTokens(SourceText text)
+        internal static ImmutableArray<StepToken> ParseTokens(SourceText text)
         {
             return ParseTokens(text, out _); // ignoring diagnostics
         }
 
-        internal static ImmutableArray<SyntaxToken> ParseTokens(ISourceText text, out ImmutableArray<Diagnostic> diagnostics)
+        internal static ImmutableArray<StepToken> ParseTokens(ISourceText text, out ImmutableArray<Diagnostic> diagnostics)
         {
-            var tokens = new List<SyntaxToken>();
-            void ParseTokens(ISourceText st, out StepSyntax root, out ImmutableArray<Diagnostic> d)
+            var tokens = new List<StepToken>();
+            void ParseTokens(ISourceText st, out StepFile root, out ImmutableArray<Diagnostic> d)
             {
                 var l = new Lexer(st);
                 while (true)
                 {
                     var token = l.Lex();
-                    if (token.Kind == SyntaxKind.EndOfFileToken)
+                    if (token.Kind == StepKind.EndOfFileToken)
                     {
-                        root = new StepSyntax(st.Source, ImmutableArray<SyntaxNode>.Empty, ImmutableArray<SyntaxNode>.Empty, token);
+                        root = new StepFile(st.Source, ImmutableArray<StepNode>.Empty, ImmutableArray<StepNode>.Empty, token);
                         break;
                     }
                     tokens.Add(token);
@@ -114,11 +114,27 @@ namespace Xbim.IO.Step21
         }
 
         /// <summary>
+        /// Static helper for full Entity parsing from string
+        /// </summary>
+        /// <param name="express">Step21 string of entity</param>
+        /// <param name="reference"></param>
+        /// <returns></returns>
+        public static StepEntityAssignment ParseEntityAssignment(string express, Uri reference)
+        {
+            if (reference == null)
+                reference = new Uri("http://undefined/");
+            
+            var sourceText = SourceText.From(express, reference);
+            var p = new Parser(sourceText);
+            return p.ParseStepEntityAssignment();
+        }
+
+        /// <summary>
         /// Static helper for full token parsing
         /// </summary>
         public static IEnumerable<Diagnostic> ParseWithEvents(ISourceText st, NewHeaderEntity newHeader, NewAssignment newAssignment)
         {
-            Parser p = new Parser(st);
+            var p = new Parser(st);
             p.ParseStepWithEvents(newHeader, newAssignment);
             return p.Diagnostics;
         }
@@ -128,7 +144,7 @@ namespace Xbim.IO.Step21
         /// </summary>
         public static IEnumerable<Diagnostic> ParseWithEvents(ISourceText st, NewHeaderEntity newHeader, NewAssignmentIgnoreAttributes newFastAssignment)
         {
-            Parser p = new Parser(st);
+            Parser p = new(st);
             p.ParseStepWithEvents(newHeader, newFastAssignment);
             return p.Diagnostics;
         }

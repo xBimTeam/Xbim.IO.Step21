@@ -5,10 +5,10 @@ namespace Xbim.IO.Step21
 {
     internal sealed class Lexer
     {
-        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
+        private readonly DiagnosticBag _diagnostics = new();
         private readonly ISourceText _text;
 
-        private SyntaxKind _kind;
+        private StepKind _kind;
         private object? _value;
 
         public Lexer(ISourceText sourceText)
@@ -22,18 +22,18 @@ namespace Xbim.IO.Step21
 
         private char Lookahead => _text.Lookahead;
 
-        public bool IgnoreValues { get; internal set; }
+        internal bool IgnoreValues { get; set; }
 
-        public SyntaxToken Lex()
+        public StepToken Lex()
         {
             _text.SetTokenStart();
-            _kind = SyntaxKind.BadTokenTrivia;
+            _kind = StepKind.BadTokenTrivia;
             _value = null;
 
             switch (Current)
             {
                 case '\0':
-                    _kind = SyntaxKind.EndOfFileToken;
+                    _kind = StepKind.EndOfFileToken;
                     break;
                 case '+':
                     if (IsNumeric(Lookahead))
@@ -42,7 +42,7 @@ namespace Xbim.IO.Step21
                         ReadStepNumber();
                         break;
                     }
-                    _kind = SyntaxKind.BadTokenTrivia;
+                    _kind = StepKind.BadTokenTrivia;
                     Progress();
                     break;
                 case '-':
@@ -53,7 +53,7 @@ namespace Xbim.IO.Step21
                         break;
                     }
                     Progress(); 
-                    _kind = SyntaxKind.BadTokenTrivia;
+                    _kind = StepKind.BadTokenTrivia;
                     break;
                 case '.':
                     if (char.IsDigit(Lookahead)) // not using IsNumeric() because we dont accept another . after the current .
@@ -79,11 +79,11 @@ namespace Xbim.IO.Step21
                     ReadStepNumber();
                     break;
                 case '*':
-                    _kind = SyntaxKind.StepOverride;
+                    _kind = StepKind.StepOverride;
                     Progress();
                     break;
                 case '$':
-                    _kind = SyntaxKind.StepUndefined;
+                    _kind = StepKind.StepUndefined;
                     Progress();
                     break;
                 case '#':
@@ -103,7 +103,7 @@ namespace Xbim.IO.Step21
                             break;
                         default:
                             Progress();
-                            _kind = SyntaxKind.HashToken;
+                            _kind = StepKind.HashToken;
                             break;
                     }
                     break;
@@ -114,28 +114,28 @@ namespace Xbim.IO.Step21
                     }
                     else
                     {
-                        _kind = SyntaxKind.BadTokenTrivia;
+                        _kind = StepKind.BadTokenTrivia;
                         Progress();
                     }
                     break;
                 case '(':
-                    _kind = SyntaxKind.OpenParenthesisToken;
+                    _kind = StepKind.OpenParenthesisToken;
                     Progress();
                     break;
                 case ')':
-                    _kind = SyntaxKind.CloseParenthesisToken;
+                    _kind = StepKind.CloseParenthesisToken;
                     Progress();
                     break;
                 case ';':
-                    _kind = SyntaxKind.SemiColonToken;
+                    _kind = StepKind.SemiColonToken;
                     Progress();
                     break;
                 case ',':
-                    _kind = SyntaxKind.CommaToken;
+                    _kind = StepKind.CommaToken;
                     Progress();
                     break;
                 case '=':
-                    _kind = SyntaxKind.EqualsToken;
+                    _kind = StepKind.EqualsToken;
                     Progress();
                     break;
                 case '\'':
@@ -171,14 +171,14 @@ namespace Xbim.IO.Step21
                     }
                     break;
             }
+            var text = StepFacts.GetText(_kind);
             if (IgnoreValues)
-                return new SyntaxToken(_text.Source, _kind, _text.GetBufferStartIndex(), "", null);
-            var text = SyntaxFacts.GetText(_kind);
+                return new StepToken(_text.Source, _kind, _text.GetBufferStartIndex(), text, null);
             if (text == null)
             {
                 text = CurrentBuffer();
             }
-            return new SyntaxToken(_text.Source, _kind, _text.GetBufferStartIndex(), text, _value);
+            return new StepToken(_text.Source, _kind, _text.GetBufferStartIndex(), text, _value);
         }
     
 
@@ -219,18 +219,18 @@ namespace Xbim.IO.Step21
             switch (text)
             {
                 case ".U.":
-                    _kind = SyntaxKind.StepUndefined;
+                    _kind = StepKind.StepUndefined;
                     break;
                 case ".T.":
-                    _kind = SyntaxKind.StepBoolean;
+                    _kind = StepKind.StepBoolean;
                     _value = true;
                     break;
                 case ".F.":
-                    _kind = SyntaxKind.StepBoolean;
+                    _kind = StepKind.StepBoolean;
                     _value = false;
                     break;
                 default:
-                    _kind = SyntaxKind.StepEnumeration;
+                    _kind = StepKind.StepEnumeration;
                     _value = text;
                     break;
             }
@@ -280,7 +280,7 @@ namespace Xbim.IO.Step21
             }
             if (IgnoreValues)
             {
-                _kind = isFloat ? SyntaxKind.StepFloat : SyntaxKind.StepInteger;
+                _kind = isFloat ? StepKind.StepFloat : StepKind.StepInteger;
                 return;
             }
             string text = CurrentBuffer();
@@ -290,15 +290,15 @@ namespace Xbim.IO.Step21
                 switch (text)
                 {
                     case "-1.#INF":
-                        _kind = SyntaxKind.StepFloat;
+                        _kind = StepKind.StepFloat;
                         _value = double.NegativeInfinity;
                         return;
                     case "1.#INF":
-                        _kind = SyntaxKind.StepFloat;
+                        _kind = StepKind.StepFloat;
                         _value = double.PositiveInfinity;
                         return;
                     case "-1.#IND":
-                        _kind = SyntaxKind.StepFloat;
+                        _kind = StepKind.StepFloat;
                         _value = double.NaN;
                         return;
                     default:
@@ -306,7 +306,7 @@ namespace Xbim.IO.Step21
                         var location = new TextLocation(_text, span);
                         _diagnostics.ReportInvalidNumber(location, text, "Float");
                         _value = double.NaN;
-                        _kind = SyntaxKind.StepFloat;
+                        _kind = StepKind.StepFloat;
                         return;
                 }
             }
@@ -320,7 +320,7 @@ namespace Xbim.IO.Step21
                     _diagnostics.ReportInvalidNumber(location, text, "Float");
                 }
                 _value = value;
-                _kind = SyntaxKind.StepFloat;
+                _kind = StepKind.StepFloat;
             }
             else
             {
@@ -331,7 +331,7 @@ namespace Xbim.IO.Step21
                     _diagnostics.ReportInvalidNumber(location, text, "Int");
                 }
                 _value = value;
-                _kind = SyntaxKind.StepInteger;
+                _kind = StepKind.StepInteger;
             }
         }
 
@@ -374,7 +374,7 @@ namespace Xbim.IO.Step21
                 }
             }
 
-            _kind = SyntaxKind.MultiLineCommentTrivia;
+            _kind = StepKind.MultiLineCommentTrivia;
         }
 
         private void ReadStepString()
@@ -415,7 +415,7 @@ namespace Xbim.IO.Step21
                         break;
                 }
             }
-            _kind = SyntaxKind.StepString;
+            _kind = StepKind.StepString;
             if (IgnoreValues)
                 return;
             var t = CurrentBuffer();
@@ -464,7 +464,7 @@ namespace Xbim.IO.Step21
                         break;
                 }
             }
-            _kind = SyntaxKind.StepHex;
+            _kind = StepKind.StepHex;
             if (IgnoreValues)
                 return;          
             _value = CurrentBuffer()[1..^1];
@@ -474,7 +474,7 @@ namespace Xbim.IO.Step21
         {
             while (char.IsWhiteSpace(Current))
                 Progress();
-            _kind = SyntaxKind.WhitespaceTrivia;
+            _kind = StepKind.WhitespaceTrivia;
         }
 
         /// <summary>
@@ -490,11 +490,11 @@ namespace Xbim.IO.Step21
                 {
                     Progress();
                 }
-                _kind = SyntaxKind.StepIdentityToken;
+                _kind = StepKind.StepIdentityToken;
                 return;
             }
 
-            StringBuilder intBuffer = new StringBuilder();
+            var intBuffer = new StringBuilder();
             while (char.IsDigit(Current))
             {
                 intBuffer.Append(Current);
@@ -508,7 +508,7 @@ namespace Xbim.IO.Step21
                 _diagnostics.ReportInvalidStepIdentity(location, text);
             }
             _value = ulongValue;
-            _kind = SyntaxKind.StepIdentityToken;
+            _kind = StepKind.StepIdentityToken;
         }
 
         private void ReadIdentifierOrKeyword()
@@ -538,8 +538,8 @@ namespace Xbim.IO.Step21
 
             string text = CurrentBuffer();
 
-            _kind = SyntaxFacts.GetKeywordKind(text);
-            if (_kind != SyntaxKind.StepIdentifierToken)
+            _kind = StepFacts.GetKeywordKind(text);
+            if (_kind != StepKind.StepIdentifierToken)
             {
                 // for all keyords we expect a ;
                 if (Current == ';')

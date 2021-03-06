@@ -6,7 +6,7 @@ namespace Xbim.IO.Step21
 {
     internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
     {
-        private readonly List<Diagnostic> _diagnostics = new List<Diagnostic>();
+        private readonly List<Diagnostic> _diagnostics = new();
 
         public DiagnosticBag()
         {
@@ -80,13 +80,13 @@ namespace Xbim.IO.Step21
             Report(location, message);
         }
 
-        public void ReportUnexpectedToken(TextLocation location, SyntaxKind actualKind, SyntaxKind expectedKind)
+        public void ReportUnexpectedToken(TextLocation location, StepKind actualKind, StepKind expectedKind)
         {
             var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
             Report(location, message);
         }
 
-        public void ReportUnexpectedToken(TextLocation location, SyntaxKind actualKind, string expectedKind)
+        public void ReportUnexpectedToken(TextLocation location, StepKind actualKind, string expectedKind)
         {
             var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
             Report(location, message);

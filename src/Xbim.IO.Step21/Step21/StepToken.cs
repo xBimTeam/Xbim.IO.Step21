@@ -7,14 +7,14 @@ using Xbim.IO.Step21.Text;
 namespace Xbim.IO.Step21
 {
     /// <summary>
-    /// Base class for complex syntax tokens
+    /// Base class for complex tokens
     /// </summary>
-    public sealed class SyntaxToken : SyntaxNode
+    public sealed class StepToken : StepNode
     {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public SyntaxToken(Uri syntaxTree, SyntaxKind kind, long position, string? text, object? value)
+        public StepToken(Uri syntaxTree, StepKind kind, long position, string? text, object? value)
             : base(syntaxTree)
         {
             Kind = kind;
@@ -26,7 +26,7 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// The classification of the node
         /// </summary>
-        public override SyntaxKind Kind { get; }
+        public override StepKind Kind { get; }
 
         /// <summary>
         /// Position of token in the data
@@ -46,14 +46,14 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// The region of data occupied by the token
         /// </summary>
-        public override TextSpan Span => new TextSpan(Position, Text?.Length ?? 0);
+        public override TextSpan Span => new(Position, Text?.Length ?? 0);
 
         /// <summary>
         /// Concrete implementation listing subcomponents of the node
         /// </summary>
-        public override IEnumerable<SyntaxNode> GetChildren()
+        public override IEnumerable<StepNode> GetChildren()
         {
-            return Array.Empty<SyntaxNode>();
+            return Array.Empty<StepNode>();
         }
 
         /// <summary>

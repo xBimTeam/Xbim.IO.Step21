@@ -8,9 +8,9 @@ namespace Xbim.IO.Step21.Tests.Syntax
     {
         [Theory]
         [MemberData(nameof(GetSyntaxKindData))]
-        public void SyntaxFact_GetText_RoundTrips(SyntaxKind kind)
+        public void SyntaxFact_GetText_RoundTrips(StepKind kind)
         {
-            var text = SyntaxFacts.GetText(kind);
+            var text = StepFacts.GetText(kind);
             if (text == null)
                 return;
 
@@ -22,7 +22,7 @@ namespace Xbim.IO.Step21.Tests.Syntax
 
         public static IEnumerable<object[]> GetSyntaxKindData()
         {
-            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            var kinds = (StepKind[])Enum.GetValues(typeof(StepKind));
             foreach (var kind in kinds)
                 yield return new object[] { kind };
         }
