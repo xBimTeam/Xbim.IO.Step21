@@ -92,8 +92,12 @@ namespace Xbim.IO.Step21.Tests.Syntax
             public string span = "";
             public string type;
             public string guid;
-            
+
+#if NETCOREAPP2_1_OR_GREATER
             public bool Equals([AllowNull] needMatch other)
+#else
+            public bool Equals(needMatch other)
+#endif
             {
                 if (other == null)
                     return false;

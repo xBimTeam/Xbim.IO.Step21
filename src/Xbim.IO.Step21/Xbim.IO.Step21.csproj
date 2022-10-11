@@ -10,7 +10,7 @@
 This library is designed for schema-independent STEP parsing. It provides file parsing, but does not check IFC schema constraints.</Description>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>5.0.3</AssemblyVersion>
+    <AssemblyVersion>5.0.4</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
 		<Version>$(AssemblyVersion)</Version>
     <SourceControlInformationFeatureSupported>true</SourceControlInformationFeatureSupported>

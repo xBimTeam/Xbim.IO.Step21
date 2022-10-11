@@ -36,10 +36,12 @@ namespace Xbim.IfcTool
 
             try
             {
+
                 var totL = (double)f.Length;
                 
                 // preparing out file
                 var outName = Path.ChangeExtension(f.FullName, ".fixed.ifc");
+
                 if (File.Exists(outName))
                     File.Delete(outName);
                 using var fw = File.CreateText(outName);
