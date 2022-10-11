@@ -3,10 +3,15 @@ using System.Collections.Generic;
 
 namespace Xbim.IO.Step21
 {
+    /// <summary>
+    /// Node describing a header entry.
+    /// </summary>
     public class StepHeaderEntity : StepNode
     {
         
-
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public StepHeaderEntity(Uri source, StepEntity entity, StepToken closing) : base(source)
         {
             Entity = entity;
@@ -28,6 +33,7 @@ namespace Xbim.IO.Step21
         /// </summary>
         public StepToken ClosingSemicolon { get; }
 
+        /// <inheritdoc />
         public override IEnumerable<StepNode> GetChildren()
         {
             yield return Entity;

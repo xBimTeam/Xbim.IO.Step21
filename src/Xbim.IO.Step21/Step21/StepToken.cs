@@ -20,6 +20,10 @@ namespace Xbim.IO.Step21
             Kind = kind;
             Position = position;
             Text = text ?? string.Empty;
+            if (kind == StepKind.SemiColonToken)
+            {
+                Text = ";\r\n";
+            }
             Value = value;
         }
 

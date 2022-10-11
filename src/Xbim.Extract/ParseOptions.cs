@@ -15,11 +15,14 @@ namespace Xbim.Extract
     [Verb("parse", HelpText = "Checks the file structure using available parsing methods.")]
     class ParseOptions
     {
-        [Option('f', "fast", Required = false, HelpText = "uses the fast parsing method.", Default = false)]
+        [Option('f', "fast", Required = false, HelpText = "uses the fast parsing method. If neither `fast` or `complete` are set, both are performed.", Default = false)]
         public bool UseFast { get; set; }
 
-        [Option('c', "complete", Required = false, HelpText = "uses the complete parsing method.", Default = false)]
+        [Option('c', "complete", Required = false, HelpText = "uses the complete parsing method. If neither `fast` or `complete` are set, both are performed.", Default = false)]
         public bool UseComplete { get; set; }
+
+        [Option('s', "stopOnIssue", Required = false, HelpText = "Stops on first issue reporting the last valid entity.", Default = false)]
+        public bool StopOnIssue { get; set; }
 
         [Value(0,
            MetaName = "source",
@@ -66,14 +69,16 @@ namespace Xbim.Extract
                 headerCount++;
             }
 
-            IEnumerable<Diagnostic> res;
             if (opts.UseComplete)
             {
+                StepEntityAssignment last = null;
+                IEnumerable<Diagnostic> res;
                 using (var progress = new ProgressBar())
                 {
                     void NewEntityAssignment(StepEntityAssignment assignment)
                     {
                         entityCount++;
+
                         if (entityCount % 1000 == 0)
                         {
                             var startPos = assignment.Span.Start;
@@ -81,13 +86,36 @@ namespace Xbim.Extract
                             progress.Report(perc);
                         }
                     }
+
+                    void FirstIssueEntityAssignment(StepEntityAssignment assignment)
+                    {
+                        entityCount++;
+                        last = assignment;
+                        if (entityCount % 1000 == 0)
+                        {
+                            var startPos = assignment.Span.Start;
+                            var perc = startPos / totL;
+                            progress.Report(perc);
+                        }
+                    }
+
+                    void NotifyIssue(Diagnostic issue)
+                    {
+                        Console.WriteLine($"{issue.Message} @ {issue.Location}.");
+                        Console.WriteLine($"Last valid entity is {last.Identity.Text} @ {last.Span}");
+                        Environment.Exit((int)Status.IfcError);
+                    }
+
+
                     var s = new Stopwatch();
                     s.Start();
                     using (var st = new BufferedUri(f))
                     {
-                        res = StepParsing.ParseWithEvents(st, NewHeaderEntity, NewEntityAssignment);
+                        res = StepParsing.ParseWithEvents(st, NewHeaderEntity,
+                            opts.StopOnIssue ? FirstIssueEntityAssignment : NewEntityAssignment,
+                            opts.StopOnIssue ? NotifyIssue : null);
                         s.Stop();
-                        Thread.Sleep(200);
+                        Thread.Sleep(400);
                         progress.Report(1);
                     }
                     Console.WriteLine($"Parsed {headerCount} header entities and {entityCount} assignments in {s.ElapsedMilliseconds} ms.");
@@ -97,6 +125,7 @@ namespace Xbim.Extract
 
             if (opts.UseFast)
             {
+                IEnumerable<Diagnostic> res;
                 using (var progress = new ProgressBar())
                 {
                     void FastEntityAssignment(StepEntityAssignmentBare assignment)
@@ -125,6 +154,8 @@ namespace Xbim.Extract
                 DiagnosticReport(res, f);
             }
         }
+
+       
 
         private static void DiagnosticReport(IEnumerable<Diagnostic> res, FileInfo f)
         {

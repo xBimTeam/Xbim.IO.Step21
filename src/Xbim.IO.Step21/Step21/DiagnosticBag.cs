@@ -8,6 +8,12 @@ namespace Xbim.IO.Step21
     {
         private readonly List<Diagnostic> _diagnostics = new();
 
+        /// <summary>
+        /// Attach a notification event here to receive issues as they occur.
+        /// Make sure to detach when finished.
+        /// </summary>
+        internal DiagnosticIssue? IssueEncountered { get; set; }
+
         public DiagnosticBag()
         {
 
@@ -34,6 +40,7 @@ namespace Xbim.IO.Step21
         private void Report(TextLocation location, string message)
         {
             var diagnostic = new Diagnostic(location, message);
+            IssueEncountered?.Invoke(diagnostic);
             _diagnostics.Add(diagnostic);
         }
 
@@ -65,6 +72,12 @@ namespace Xbim.IO.Step21
         public void ReportUnterminatedString(TextLocation location)
         {
             var message = "Unterminated string literal.";
+            Report(location, message);
+        }
+
+        public void ReportUnterminatedHex(TextLocation location)
+        {
+            var message = "Unterminated hex literal.";
             Report(location, message);
         }
 

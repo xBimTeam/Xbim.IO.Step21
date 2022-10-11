@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Xbim.Fix": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Data\\Ifc\\_DebugSupport\\1\\001_Asse.ifc\""
+    }
+  }
+}

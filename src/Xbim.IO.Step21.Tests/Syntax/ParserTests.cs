@@ -14,6 +14,8 @@ namespace Xbim.IO.Step21.Tests.Syntax
         [InlineData(@"C:\Data\Ifc\Basics\OneWall.ifc")]
         [InlineData(@"C:\Data\Ifc\Basics\Duplex_MEP_20110907.ifc")]
         [InlineData(@"C:\Data\Ifc\Basics\Duplex_A_20110907.ifc")]
+        [InlineData(@"C:\Data\Ifc\_DebugSupport\1\001_Asse.ifc")]
+        [InlineData(@"TestFiles\Strings.ifc")]
         public void CanParse(string fileName)
         {
             var s = SourceText.From(new FileInfo(fileName));

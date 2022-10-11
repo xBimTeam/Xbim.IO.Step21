@@ -50,8 +50,7 @@ namespace Xbim.IO.Step21.Step21.Text
         private int GetNextBuffer()
         {
             _lookAheadProg = false;
-            if (_crossingCurrentBuilder == null)
-                _crossingCurrentBuilder = new StringBuilder();
+            _crossingCurrentBuilder ??= new StringBuilder();
             _crossingCurrentBuilder.Append(CurrentBufferSpan());  
             _spanOffset += _bufferLen;
             _bufferLen = _streamReader.ReadBlock(_buffer);
@@ -218,8 +217,7 @@ namespace Xbim.IO.Step21.Step21.Text
                     // _buffer ok
                     // _memSpan ok
                     // _sourceFile ok
-                    if (!(_streamReader is null))
-                        _streamReader.Dispose();
+                    _streamReader?.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

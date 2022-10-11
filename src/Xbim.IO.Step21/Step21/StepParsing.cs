@@ -132,10 +132,10 @@ namespace Xbim.IO.Step21
         /// <summary>
         /// Static helper for full token parsing
         /// </summary>
-        public static IEnumerable<Diagnostic> ParseWithEvents(ISourceText st, NewHeaderEntity newHeader, NewAssignment newAssignment)
+        public static IEnumerable<Diagnostic> ParseWithEvents(ISourceText st, NewHeaderEntity newHeader, NewAssignment newAssignment, DiagnosticIssue? Issue = null)
         {
             var p = new Parser(st);
-            p.ParseStepWithEvents(newHeader, newAssignment);
+            p.ParseStepWithEvents(newHeader, newAssignment, Issue);
             return p.Diagnostics;
         }
 

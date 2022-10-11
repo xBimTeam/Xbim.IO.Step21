@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "Xbim.Extract": {
+    "parse": {
       "commandName": "Project",
-      "commandLineArgs": "strip \"C:\\Data\\Dev\\Xbim50\\Xbim.IO.Step21\\src\\Xbim.IO.Step21.Tests\\TestFiles\\Duplex_A.subset.ifc\" -r 5543"
+      "commandLineArgs": "parse  -c -s \"C:\\Data\\Ifc\\NDA\\2022 03 23 - SUN2022-4\\NL210601MF-01.ifc\" "
+    },
+    "extract": {
+      "commandName": "Project",
+      "commandLineArgs": "strip \"C:\\Data\\Ifc\\_NDA\\2022 08 15 - STR regressioni\\IL MULINO-ARCH_REV.07.ifc\" -spatial -e 632327"
     }
   }
 }

@@ -25,7 +25,13 @@ namespace Xbim.IO.Step21
     /// </summary>
     /// <param name="assignmentFound">data of the entity encountered</param>
     public delegate void NewAssignment(StepEntityAssignment assignmentFound);
-    
+
+    /// <summary>
+    /// Triggered when encountering a parsing issue
+    /// </summary>
+    /// <param name="issue">data of the issue encountered</param>
+    public delegate void DiagnosticIssue(Diagnostic issue);
+
     internal sealed class Parser
     {
         private readonly DiagnosticBag _diagnostics = new();
@@ -72,9 +78,14 @@ namespace Xbim.IO.Step21
 
         public bool QuickParse { get; set; } = false;
 
-        public void ParseStepWithEvents(NewHeaderEntity? head, NewAssignment? assignment)
+        public void ParseStepWithEvents(NewHeaderEntity? head, NewAssignment? assignment, DiagnosticIssue? issue)
         {
             // Start of step format
+            if (issue != null)
+            {
+                _diagnostics.IssueEncountered += issue;
+                _lexer.Diagnostics.IssueEncountered += issue;
+            }
             var stepStart = MatchToken(StepKind.StepOrIsoStartKeyword);
             var headerStart = MatchToken(StepKind.StepStartHeaderSectionKeyword);
 
@@ -91,6 +102,11 @@ namespace Xbim.IO.Step21
             }
             _ = MatchToken(StepKind.StepEndSectionKeyword);
             _ = MatchToken(StepKind.StepOrIsoEndKeyword);
+            if (issue != null)
+            {
+                _diagnostics.IssueEncountered -= issue;
+                _lexer.Diagnostics.IssueEncountered -= issue;
+            }
         }
 
         public void ParseStepWithEvents(NewHeaderEntity? head, NewAssignmentIgnoreAttributes? assignment)

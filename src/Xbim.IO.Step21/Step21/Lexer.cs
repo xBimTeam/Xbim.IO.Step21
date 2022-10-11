@@ -22,6 +22,9 @@ namespace Xbim.IO.Step21
 
         private char Lookahead => _text.Lookahead;
 
+        /// <summary>
+        /// Attempts to save parsing time by avoiding the settin of value, whenever possible
+        /// </summary>
         internal bool IgnoreValues { get; set; }
 
         public StepToken Lex()
@@ -139,15 +142,18 @@ namespace Xbim.IO.Step21
                     Progress();
                     break;
                 case '\'':
+                    _kind = StepKind.StepString;
                     ReadStepString();
                     break;
                 case '"':
+                    _kind = StepKind.StepHex;
                     ReadHex();
                     break;
                 case ' ':
                 case '\t':
                 case '\n':
                 case '\r':
+                    _kind = StepKind.WhitespaceTrivia;
                     ReadWhiteSpace();
                     break;
                 case '_':
@@ -174,10 +180,7 @@ namespace Xbim.IO.Step21
             var text = StepFacts.GetText(_kind);
             if (IgnoreValues)
                 return new StepToken(_text.Source, _kind, _text.GetBufferStartIndex(), text, null);
-            if (text == null)
-            {
-                text = CurrentBuffer();
-            }
+            text ??= CurrentBuffer();
             return new StepToken(_text.Source, _kind, _text.GetBufferStartIndex(), text, _value);
         }
     
@@ -187,6 +190,10 @@ namespace Xbim.IO.Step21
             _text.ProgressChar();
         }
 
+        /// <summary>
+        /// The kind set by this method is <see cref="StepKind.StepUndefined"/>, <see cref="StepKind.StepBoolean"/> or <see cref="StepKind.StepEnumeration"/>
+        /// This requires checking the CurrentBuffer even if <see cref="IgnoreValues"/> is true.
+        /// </summary>
         private void ReadStepEnumStyle()
         {
             Progress(); // skip initial "."           
@@ -213,8 +220,7 @@ namespace Xbim.IO.Step21
                 }
             }
 
-            // we cannot ignore the content to determine the return,
-            // even if <see cref="IgnoreValues"/> is true.
+            // we cannot ignore the content to determine the kind, even if <see cref="IgnoreValues"/> is true.
             string text = CurrentBuffer();
             switch (text)
             {
@@ -385,7 +391,7 @@ namespace Xbim.IO.Step21
 
             // the regex in xbim is
             // [\']([\001-\046\050-\377]|(\'\')|(\\S\\.))*[\']
-            // the last \\S... is weird, we'll just get everyting until \'
+            // the last \\S is the solidus for highpoint... it's \S\. and . gets increased by 128 for string value
             while (!done)
             {
                 switch (Current)
@@ -396,10 +402,36 @@ namespace Xbim.IO.Step21
                         _diagnostics.ReportUnterminatedString(location);
                         done = true;
                         break;
-                    case '\'':
+                    case '\\': // backslash
+                        if (Lookahead == 'S')
+                        {
+                            Progress(); // past \
+                            Progress(); // past S
+                            if (Current == '\0')
+                            {
+                                var span2 = _text.GetTokenSpan();
+                                var location2 = new TextLocation(_text, span2);
+                                _diagnostics.ReportUnterminatedString(location2);
+                                done = true;
+                                break;
+                            }
+                            Progress(); // past \
+                            if (Current == '\0')
+                            {
+                                var span2 = _text.GetTokenSpan();
+                                var location2 = new TextLocation(_text, span2);
+                                _diagnostics.ReportUnterminatedString(location2);
+                                done = true;
+                                break;
+                            }
+                            Progress(); // past whatever other character follows
+                        }
+                        else
+                            Progress();
+                        break;
+                    case '\'': // apostrophe
                         if (Lookahead == '\'')
                         {
-                            
                             Progress();
                             Progress();
                         }
@@ -410,7 +442,6 @@ namespace Xbim.IO.Step21
                         }
                         break;
                     default:
-                        
                         Progress();
                         break;
                 }
@@ -420,6 +451,8 @@ namespace Xbim.IO.Step21
                 return;
             var t = CurrentBuffer();
             _value = t[1..^1].Replace("\'\'", "\'");
+            // todo: string value should convert any \S\. and \X patterns
+            // see XbimP21StringDecoder
         }
 
         private void ReadHex()
@@ -440,7 +473,7 @@ namespace Xbim.IO.Step21
                         {
                             var span = _text.GetTokenSpan(); 
                             var location = new TextLocation(_text, span);
-                            _diagnostics.ReportUnterminatedString(location);
+                            _diagnostics.ReportUnterminatedHex(location);
                         }
                         done = true;
                         break;

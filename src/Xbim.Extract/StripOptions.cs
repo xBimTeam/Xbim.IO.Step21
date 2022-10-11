@@ -11,7 +11,7 @@ using static Xbim.Extract.Program;
 
 namespace Xbim.Extract
 {
-    [Verb("strip", HelpText = "Reduces ifc files retaining selected entities only. Example: strip file.ifc -e 1 23")]
+    [Verb("strip", HelpText = "Reduces ifc files retaining selected entities only. Example: strip file.ifc -spatial -e 123 234")]
     class StripOptions
     {
         [Value(0,
@@ -35,7 +35,7 @@ namespace Xbim.Extract
 
         [Option(
             'r', "referencing",
-            HelpText = "search for ifcEntities referencing the provided list."
+            HelpText = "search for ifcEntities referencing the provided list. Use this to get the entities referencing a geometry, possibily combined with the -spatial option."
             )]
         public IEnumerable<string> Referencing { get; set; }
 

@@ -15,9 +15,18 @@ namespace Xbim.IO.Step21.Tests.Syntax
                 return;
 
             var tokens = StepParsing.ParseTokens(text);
+            
             var token = Assert.Single(tokens);
             Assert.Equal(kind, token.Kind);
-            Assert.Equal(text, token.Text);
+            if (kind == StepKind.SemiColonToken)
+            {
+                Assert.Equal(";\r\n", token.Text);
+            }
+            else
+            {
+                Assert.Equal(text, token.Text);
+            }
+            
         }
 
         public static IEnumerable<object[]> GetSyntaxKindData()

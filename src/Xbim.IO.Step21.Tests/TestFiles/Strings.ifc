@@ -1,0 +1,18 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION (('ViewDefinition [CoordinationView]','ViewDefinition [CoordinationView]','SomeEngine.'), '2;1');
+FILE_NAME ('IFC Engine DLL test', '2006-03-31T16:51:19', ('Architect'), ('Building Designer Office'), 'test', 'Windows System', 'The authorising person.');
+FILE_SCHEMA (('IFC2X3'));
+ENDSEC;
+DATA;
+#1=IFCAPPLICATION(#1,'2011','App','Short');
+/* Ascii offset in middle of string (valid ifc)*/
+#2=IFCAPPLICATION(#1,'20\S\'11','App','Short');
+/* Ascii offset at end of string  (valid ifc)*/
+#3=IFCAPPLICATION(#1,'20\S\'','App','Short');
+/*This would be invalid, but we can tolerate*/
+#4=IFCAPPLICATION(#1,'20\Some','App','Short');
+/*This would be invalid, but we can tolerate*/
+#5=IFCAPPLICATION(#1,'20\','App','Short');
+ENDSEC;
+END-ISO-10303-21;

@@ -12,8 +12,6 @@ namespace Xbim.Extract
 {
     class Program
     {
-
-
         static int Main(string[] args)
         {
             var t = Parser.Default.ParseArguments<
@@ -35,6 +33,7 @@ namespace Xbim.Extract
             CommandLineError = 2,
             NotFoundError = 4,
             Exception = 8,
+            IfcError = 16,
         }
 
     }

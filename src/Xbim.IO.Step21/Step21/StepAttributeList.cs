@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.ExceptionServices;
 
 namespace Xbim.IO.Step21
 {
@@ -45,5 +48,23 @@ namespace Xbim.IO.Step21
             }
             yield return _closeParenthesisToken;
         }
+
+        /// <inheritdoc />
+        public override void WritePart21(StreamWriter writer)
+        {
+            //bool firstArg = true; 
+            _openParenthesisToken.WritePart21(writer);
+            foreach (var argument in Attributes.GetWithSeparators())
+            {
+                //if (!firstArg)
+                //{
+                //    writer.Write(",");
+                //    firstArg = false;
+                //}
+                argument.WritePart21(writer);
+            }
+            _closeParenthesisToken.WritePart21(writer);
+        }
+
     }
 }

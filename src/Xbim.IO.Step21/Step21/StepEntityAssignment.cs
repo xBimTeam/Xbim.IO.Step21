@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Xbim.IO.Step21
 {
@@ -53,6 +54,15 @@ namespace Xbim.IO.Step21
             yield return Identity;
             yield return Entity;
             yield return ClosingSemicolon;
+        }
+
+        /// <inheritdoc />
+        public override void WritePart21(StreamWriter writer)
+        {
+            Identity.WritePart21(writer);
+            writer.Write("=");
+            Entity.WritePart21(writer);
+            ClosingSemicolon.WritePart21(writer);   
         }
     }
 }

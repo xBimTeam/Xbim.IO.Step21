@@ -29,7 +29,8 @@ for any questions, happy to help there.
 - [x] Add XML documentation comments to all public members.
 - [x] Fire events when relevant data found while parsing.
 - [x] Stripping features added to Xbim.Extract
-- [x] Stripping features extended to inject spatial relationships to site and project
+- [x] Stripping features extended to inject spatial relationships to site and project.
+- [x] Tool to fix malformed syntax issues in IFC. 
 
 ## Todo
 
