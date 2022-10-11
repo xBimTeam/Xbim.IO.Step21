@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
     <Authors>Claudio Benghi</Authors>
-    <Company />
     <Copyright>Claudio Benghi</Copyright>
     <PackageLicenseExpression>CDDL-1.0</PackageLicenseExpression>
     <Description>Fast Express STEP part 21 parsing in .NET
@@ -43,4 +42,13 @@ This library is designed for schema-independent STEP parsing. It provides file p
 			<Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput" />
 		</Exec>
 	</Target>
+  <!--
+	If the expected destination folder exists on the local machine, this target copies the produced nupkg there too.
+	We are using forward slashes as they work on all OSs, but this is really only useful on windows at the moment.
+	-->
+  <Target Name="PublishLocally" AfterTargets="Pack" Condition="Exists('C:/Users/Claudio/OneDrive/Benghi/FastViewer') And '$(Configuration)' == 'Release'">
+    <!-- just use forward slashes, works in windws as well -->
+    <Message Importance="high" Text="Copying local package to:  C:/Users/Claudio/OneDrive/Benghi/FastViewer" />
+    <Copy SourceFiles="$(OutputPath)/$(PackageId).$(PackageVersion).nupkg" DestinationFolder="C:/Users/Claudio/OneDrive/Benghi/FastViewer" />
+  </Target>
 </Project>
