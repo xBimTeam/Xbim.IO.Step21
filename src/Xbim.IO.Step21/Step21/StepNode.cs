@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
+using Xbim.IO.Step21.Step21;
 using Xbim.IO.Step21.Text;
 
 namespace Xbim.IO.Step21
@@ -173,7 +174,7 @@ namespace Xbim.IO.Step21
             // input text starts and end with '
             if (text.Length < 2)
                 return "''";
-            text = text[1..^1];
+            text = StringHelper.StripBoundaries(text);
             var d = new XbimP21StringDecoder(text);
             return $"'{ToPart21(d.Unescape())}'";
         }

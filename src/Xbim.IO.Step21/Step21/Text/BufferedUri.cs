@@ -35,7 +35,11 @@ namespace Xbim.IO.Step21.Step21.Text
             _sourceFile = new Uri(file.FullName);
             _streamReader = new StreamReader(file.FullName, true);
             _buffer = new char[BufferSize];
+#if NETSTANDARD2_1_OR_GREATER
             _bufferLen = _streamReader.ReadBlock(_buffer);
+#else
+            _bufferLen = _streamReader.ReadBlock(_buffer, 0, BufferSize);
+#endif
             _position = 0;
             _start = 0;
             _spanOffset = 0;
@@ -53,7 +57,11 @@ namespace Xbim.IO.Step21.Step21.Text
             _crossingCurrentBuilder ??= new StringBuilder();
             _crossingCurrentBuilder.Append(CurrentBufferSpan());  
             _spanOffset += _bufferLen;
+#if NETSTANDARD2_1_OR_GREATER
             _bufferLen = _streamReader.ReadBlock(_buffer);
+#else
+            _bufferLen = _streamReader.ReadBlock(_buffer, 0, _buffer.Length);
+#endif
             return _bufferLen;
         }
 

@@ -1,5 +1,7 @@
 using Xbim.IO.Step21.Text;
 using System.Text;
+using System;
+using Xbim.IO.Step21.Step21;
 
 namespace Xbim.IO.Step21
 {
@@ -450,7 +452,7 @@ namespace Xbim.IO.Step21
             if (IgnoreValues)
                 return;
             var t = CurrentBuffer();
-            _value = t[1..^1].Replace("\'\'", "\'");
+            _value = StringHelper.StripBoundaries(t).Replace("\'\'", "\'");
             // todo: string value should convert any \S\. and \X patterns
             // see XbimP21StringDecoder
         }
@@ -499,9 +501,11 @@ namespace Xbim.IO.Step21
             }
             _kind = StepKind.StepHex;
             if (IgnoreValues)
-                return;          
-            _value = CurrentBuffer()[1..^1];
+                return;
+            _value = StringHelper.StripBoundaries(CurrentBuffer()); 
         }
+
+       
 
         private void ReadWhiteSpace()
         {
