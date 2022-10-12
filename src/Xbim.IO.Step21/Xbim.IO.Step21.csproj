@@ -10,7 +10,7 @@
 This library is designed for schema-independent STEP parsing. It provides file parsing, but does not check IFC schema constraints.</Description>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>5.0.4</AssemblyVersion>
+    <AssemblyVersion>5.0.5</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
 		<Version>$(AssemblyVersion)</Version>
     <SourceControlInformationFeatureSupported>true</SourceControlInformationFeatureSupported>
@@ -19,6 +19,8 @@ This library is designed for schema-independent STEP parsing. It provides file p
     <RepositoryUrl>https://github.com/xBimTeam/Xbim.IO.Step21.git</RepositoryUrl>
     <LangVersion>latest</LangVersion>
     <DocumentationFile>bin\$(Configuration)\Xbim.IO.Step21.xml</DocumentationFile>
+    <AssemblyOriginatorKeyFile>XbimOpenSourceKeyFile.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
