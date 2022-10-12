@@ -5,9 +5,11 @@
     <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <PackageLicenseExpression>CDDL-1.0</PackageLicenseExpression>
     <Authors>Claudio Benghi</Authors>
-    <Product />
     <Copyright>Claudio Benghi</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <AssemblyOriginatorKeyFile>XbimOpenSourceKeyFile.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
+
   </PropertyGroup>
 
   <ItemGroup>
